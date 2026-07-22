@@ -22,53 +22,59 @@ import { ListSkeleton } from "@/components/shared/loading-skeletons";
 import { PurohitRadiusMap } from "@/components/map/purohit-radius-map";
 import { IncomingRequestModal } from "@/components/booking/incoming-request-modal";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useBookingStore } from "@/store/useBookingStore";
 import { usePusherChannel } from "@/hooks/usePusherChannel";
-import { acceptBooking, getNearbyRequests } from "@/lib/api/bookings";
-import { setAvailability } from "@/lib/api/purohits";
+import { acceptBooking, getNearbyRequests, getMyBookings } from "@/lib/api/bookings";
+import { getPurohitById } from "@/lib/api/purohits";
 import { ApiError } from "@/lib/api/axios";
 import type {
   BroadcastBookingDoc,
   NewBookingRequestEvent,
   PurohitResponse,
 } from "@/types";
+import { ActiveBooking } from "@/app/(dashboard)/purohit/components/ActiveBooking";
+import { useEffect } from "react";
+import { OnlineToggle } from "@/app/(dashboard)/purohit/components/OnlineToggle";
 
 export function PurohitDashboard() {
   const profile = useAuthStore((s) => s.profile) as PurohitResponse | null;
   const setProfile = useAuthStore((s) => s.setProfile);
+  const setActiveBooking = useBookingStore((s) => s.setActiveBooking);
   const queryClient = useQueryClient();
 
   const [incomingRequest, setIncomingRequest] =
     useState<NewBookingRequestEvent | null>(null);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
 
-  const isOnline = profile?.is_available ?? false;
+  const isOnline = profile?.is_online ?? false;
   const lat = profile?.location.coordinates[1] ?? 0;
   const lng = profile?.location.coordinates[0] ?? 0;
   const radiusKm = profile?.service_radius_km ?? 10;
 
-  const availabilityMutation = useMutation({
-    mutationFn: setAvailability,
-    onSuccess: (updated) => {
-      setProfile(updated);
-      toast.success(updated.is_available ? "You're online" : "You're offline", {
-        description: updated.is_available
-          ? "You'll now receive nearby booking requests."
-          : "You won't receive new booking requests.",
-      });
-    },
-    onError: (error) => {
-      toast.error("Couldn't update availability", {
-        description: error instanceof ApiError ? error.message : undefined,
-      });
-    },
-  });
-
+  // Removed availabilityMutation as it's now inside OnlineToggle
   const nearbyQuery = useQuery({
     queryKey: ["nearby-requests", lat, lng, radiusKm],
     queryFn: () => getNearbyRequests(lat, lng, radiusKm),
     enabled: Boolean(profile) && isOnline,
     refetchInterval: 15_000,
   });
+
+  const myBookingsQuery = useQuery({
+    queryKey: ["purohit-bookings"],
+    queryFn: () => getMyBookings(10),
+    enabled: Boolean(profile),
+  });
+
+  useEffect(() => {
+    if (myBookingsQuery.data) {
+      const active = myBookingsQuery.data.find(
+        (b) => b.status === "ACCEPTED" || b.status === "COMPLETION_PENDING" || b.status === "SEARCHING"
+      );
+      if (active) {
+        setActiveBooking(active);
+      }
+    }
+  }, [myBookingsQuery.data, setActiveBooking]);
 
   const acceptMutation = useMutation({
     mutationFn: acceptBooking,
@@ -124,25 +130,14 @@ export function PurohitDashboard() {
         onDismiss={() => handleDismiss(incomingRequest?.booking_id)}
       />
 
+      {/* Active Booking Component */}
+      <ActiveBooking />
+
       {/* Bento top row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="glass-panel sm:col-span-2 lg:col-span-2">
           <CardContent className="flex items-center justify-between gap-4 py-6">
-            <div>
-              <p className="text-sm text-muted-foreground">Availability</p>
-              <p className="mt-1 flex items-center gap-2 text-xl font-semibold">
-                <span
-                  className={`size-2.5 rounded-full ${isOnline ? "bg-emerald-500" : "bg-muted-foreground/40"}`}
-                />
-                {isOnline ? "Online — accepting requests" : "Offline"}
-              </p>
-            </div>
-            <Switch
-              checked={isOnline}
-              disabled={availabilityMutation.isPending}
-              onCheckedChange={(checked) => availabilityMutation.mutate(checked)}
-              className="scale-125"
-            />
+            <OnlineToggle />
           </CardContent>
         </Card>
 

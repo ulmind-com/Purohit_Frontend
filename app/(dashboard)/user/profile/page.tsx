@@ -309,7 +309,7 @@ export default function UserProfilePage() {
               </div>
             </CardHeader>
             <CardContent>
-              {!profile.addresses || profile.addresses.length === 0 ? (
+              {!(profile.addresses || []).length ? (
                 <div className="flex flex-col items-center justify-center py-10 px-4 border-2 border-dashed border-border/60 rounded-xl bg-muted/30">
                   <MapPin className="h-10 w-10 text-muted-foreground/50 mb-3" />
                   <p className="text-muted-foreground text-sm mb-4">No saved addresses found.</p>
@@ -320,7 +320,7 @@ export default function UserProfilePage() {
               ) : (
                 <div className="space-y-3">
                   <AnimatePresence>
-                    {profile.addresses.map((address) => (
+                    {(profile.addresses || []).map((address) => (
                       <motion.div
                         key={address.address_id}
                         initial={{ opacity: 0, scale: 0.98 }}

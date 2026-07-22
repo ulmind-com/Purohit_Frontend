@@ -63,6 +63,7 @@ export interface PurohitResponse {
   rating: number;
   price: number;
   is_available: boolean;
+  is_online: boolean;
   fcm_device_token: string | null;
   created_at: string;
 }
@@ -78,7 +79,8 @@ export type BookingStatus =
   | "Cancelled"
   // Uber-flow broadcast statuses (app/db/booking_crud.py)
   | "SEARCHING"
-  | "ACCEPTED";
+  | "ACCEPTED"
+  | "COMPLETION_PENDING";
 
 export interface BookingResponse {
   _id: string;

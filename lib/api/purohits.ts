@@ -37,6 +37,7 @@ export interface UpdatePurohitProfilePayload {
   service_radius_km?: number;
   price?: number;
   is_available?: boolean;
+  is_online?: boolean;
 }
 
 /** Requires the `PATCH /purohits/me` addition documented in the project README. */
@@ -49,6 +50,16 @@ export async function updateMyPurohitProfile(
 
 export async function setAvailability(is_available: boolean) {
   return updateMyPurohitProfile({ is_available });
+}
+
+export async function setOnlineStatus(is_online: boolean) {
+  return updateMyPurohitProfile({ is_online });
+}
+
+export async function updateLocation(lat: number, lng: number) {
+  return updateMyPurohitProfile({ 
+    location: { type: "Point", coordinates: [lng, lat] } 
+  });
 }
 
 /**

@@ -12,7 +12,7 @@ export function Logo({ className }: { className?: string }) {
           className="object-contain"
         />
       </div>
-      <span className="text-lg tracking-tight">Purohit</span>
+      <span className="text-lg tracking-tight">PujaConnect</span>
     </div>
   );
 }

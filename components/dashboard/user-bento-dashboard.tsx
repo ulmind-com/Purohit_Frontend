@@ -17,17 +17,39 @@ import { Badge } from "@/components/ui/badge";
 import { BentoGridSkeleton } from "@/components/shared/loading-skeletons";
 import { ApiErrorAlert } from "@/components/shared/api-error-alert";
 import { getMyBookingHistory } from "@/lib/api/users";
+import { getMyBookings } from "@/lib/api/bookings";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useBookingStore } from "@/store/useBookingStore";
 import type { UserResponse } from "@/types";
 import { STATUS_BADGE_VARIANT } from "@/lib/booking-status";
+import { ActiveBooking } from "@/app/(dashboard)/user/components/ActiveBooking";
+import { useEffect } from "react";
 
 export function UserBentoDashboard() {
   const profile = useAuthStore((s) => s.profile) as UserResponse | null;
+  const setActiveBooking = useBookingStore((s) => s.setActiveBooking);
 
   const historyQuery = useQuery({
     queryKey: ["booking-history", 0, 5],
     queryFn: () => getMyBookingHistory(0, 5),
   });
+
+  const myBookingsQuery = useQuery({
+    queryKey: ["my-bookings"],
+    queryFn: () => getMyBookings(10),
+    enabled: Boolean(profile),
+  });
+
+  useEffect(() => {
+    if (myBookingsQuery.data) {
+      const active = myBookingsQuery.data.find(
+        (b) => b.status === "ACCEPTED" || b.status === "COMPLETION_PENDING" || b.status === "SEARCHING"
+      );
+      if (active) {
+        setActiveBooking(active);
+      }
+    }
+  }, [myBookingsQuery.data, setActiveBooking]);
 
   if (!profile || historyQuery.isLoading) {
     return <BentoGridSkeleton />;
@@ -36,8 +58,12 @@ export function UserBentoDashboard() {
   const upcoming = historyQuery.data?.filter((b) => b.status !== "Completed" && b.status !== "Cancelled") ?? [];
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {/* Hero CTA tile */}
+    <div className="space-y-6">
+      {/* Active Booking Component */}
+      <ActiveBooking />
+      
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Hero CTA tile */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -74,7 +100,7 @@ export function UserBentoDashboard() {
       <StatTile
         icon={MapPin}
         label="Saved addresses"
-        value={String(profile.addresses.length)}
+        value={String((profile.addresses || []).length)}
         delay={0.1}
       />
 
@@ -143,6 +169,7 @@ export function UserBentoDashboard() {
           </CardContent>
         </Card>
       </motion.div>
+    </div>
     </div>
   );
 }
