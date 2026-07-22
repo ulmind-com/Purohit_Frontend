@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { loginSchema, type LoginFormValues } from "@/lib/validators/auth";
 import { useLogin } from "@/hooks/useAuth";
 
-export default function LoginPage() {
+function LoginForm() {
   const searchParams = useSearchParams();
   const loginMutation = useLogin();
 
@@ -115,5 +115,13 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </motion.div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center h-full w-full"><Loader2 className="animate-spin w-8 h-8" /></div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

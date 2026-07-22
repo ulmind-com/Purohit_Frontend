@@ -64,6 +64,8 @@ export function useConnectionState(onChange: (state: string) => void) {
     if (!client) return;
     const handler = (states: { current: string }) => onChange(states.current);
     client.connection.bind("state_change", handler);
-    return () => client.connection.unbind("state_change", handler);
+    return () => {
+      client.connection.unbind("state_change", handler);
+    };
   }, [onChange]);
 }
