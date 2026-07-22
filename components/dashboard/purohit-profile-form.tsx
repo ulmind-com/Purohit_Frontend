@@ -45,7 +45,7 @@ export function PurohitProfileForm({ profile }: { profile: PurohitResponse }) {
   const setProfile = useAuthStore((s) => s.setProfile);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as any,
     defaultValues: {
       name: profile.name,
       mobile_number: profile.mobile_number,
