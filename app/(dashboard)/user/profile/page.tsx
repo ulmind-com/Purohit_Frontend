@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +16,8 @@ import {
   MoreVertical,
   Loader2,
   Trash2,
-  Edit2
+  Edit2,
+  Camera
 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -64,7 +65,10 @@ const fadeSlideUp: Variants = {
 
 export default function UserProfilePage() {
   const profile = useAuthStore((s) => s.profile) as UserResponse | null;
+  const setProfile = useAuthStore((s) => s.setProfile);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -91,6 +95,49 @@ export default function UserProfilePage() {
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsSubmitting(false);
     toast.success("Profile updated successfully!");
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate size (e.g. max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size should be less than 5MB");
+      return;
+    }
+
+    setIsUploadingPhoto(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // We use a direct fetch here to upload. Adjust auth headers if necessary (e.g., retrieving token from cookies or state)
+      // Assuming Next.js app handles the token in cookies or via an interceptor in a real setup.
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"}/users/me/profile-picture`, {
+        method: "POST",
+        headers: {
+          // If you store token in localStorage or cookies, add it here.
+          "Authorization": `Bearer ${useAuthStore.getState().accessToken || ""}`
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      const updatedUser = await response.json();
+      setProfile(updatedUser);
+      toast.success("Profile picture updated!");
+    } catch (error: any) {
+      toast.error(error.message || "Something went wrong uploading the image");
+    } finally {
+      setIsUploadingPhoto(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
   };
 
   const getInitials = (name: string) => {
@@ -127,14 +174,30 @@ export default function UserProfilePage() {
         
         {/* HERO SECTION */}
         <motion.div variants={fadeSlideUp} className="flex flex-col items-center justify-center pt-6 pb-2 space-y-4 text-center">
-          <div className="relative">
+          <div className="relative group cursor-pointer" onClick={() => !isUploadingPhoto && fileInputRef.current?.click()}>
             <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#FF7A00] to-[#FF004D] blur-md opacity-30 animate-pulse"></div>
-            <Avatar className="w-24 h-24 border-2 border-background shadow-xl relative z-10">
-              <AvatarImage src={profile.profile_picture || ""} alt="Profile" />
+            <Avatar className="w-24 h-24 border-2 border-background shadow-xl relative z-10 overflow-hidden transition-all duration-300">
+              <AvatarImage src={profile.profile_picture || ""} alt="Profile" className={isUploadingPhoto ? "opacity-50 blur-sm" : ""} />
               <AvatarFallback className="text-3xl font-bold bg-gradient-to-br from-[#FF7A00] to-[#FF004D] text-white">
                 {getInitials(currentName || "User")}
               </AvatarFallback>
+              
+              {/* Hover/Loading Overlay */}
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                {isUploadingPhoto ? (
+                  <Loader2 className="w-6 h-6 text-white animate-spin" />
+                ) : (
+                  <Camera className="w-6 h-6 text-white" />
+                )}
+              </div>
             </Avatar>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden" 
+              accept="image/*" 
+              onChange={handlePhotoUpload} 
+            />
           </div>
           <div className="space-y-1">
             <h1 className="text-3xl font-bold tracking-tight">{currentName}</h1>
