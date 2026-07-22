@@ -1,31 +1,322 @@
 "use client";
 
-import { ProfileFormSkeleton } from "@/components/shared/loading-skeletons";
-import { UserProfileForm } from "@/components/dashboard/user-profile-form";
-import { AddressManager } from "@/components/dashboard/address-manager";
-import { useAuthStore } from "@/store/useAuthStore";
-import type { UserResponse } from "@/types";
+import { useState } from "react";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { toast } from "sonner";
+import { 
+  User, 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Home, 
+  Briefcase,
+  MoreVertical,
+  Loader2,
+  Trash2,
+  Edit2
+} from "lucide-react";
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+// Zod Validation Schema
+const profileSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().regex(/^\d{10}$/, "Phone must be exactly 10 digits"),
+});
+type ProfileFormValues = z.infer<typeof profileSchema>;
+
+// Dummy Data Types
+type Address = {
+  id: string;
+  label: string;
+  address_line: string;
+  type: "home" | "work" | "other";
+};
+
+// Animation Variants
+const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
+const fadeSlideUp: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
+};
 
 export default function UserProfilePage() {
-  const profile = useAuthStore((s) => s.profile) as UserResponse | null;
+  // Dummy State for UI Demonstration
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [addresses, setAddresses] = useState<Address[]>([
+    {
+      id: "1",
+      label: "Home",
+      address_line: "B-402, Lotus Apartments, New Town, Kolkata 700156",
+      type: "home"
+    },
+    {
+      id: "2",
+      label: "Office",
+      address_line: "Tech Park, Sector 5, Salt Lake, Kolkata 700091",
+      type: "work"
+    }
+  ]);
+
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      name: "Rohan Sharma",
+      email: "rohan.sharma@example.com",
+      phone: "9876543210",
+    },
+  });
+
+  const onSubmit = async (data: ProfileFormValues) => {
+    setIsSubmitting(true);
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setIsSubmitting(false);
+    toast.success("Profile updated successfully!");
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+  };
+
+  const currentName = form.watch("name");
+  const currentEmail = form.watch("email");
+
+  const renderIcon = (type: string) => {
+    switch (type) {
+      case "home": return <Home className="w-5 h-5 text-muted-foreground" />;
+      case "work": return <Briefcase className="w-5 h-5 text-muted-foreground" />;
+      default: return <MapPin className="w-5 h-5 text-muted-foreground" />;
+    }
+  };
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
-        <p className="mt-1 text-muted-foreground">
-          Manage your account and saved addresses.
-        </p>
-      </div>
+    <div className="w-full min-h-screen bg-background text-foreground pb-12">
+      <motion.div 
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+        className="max-w-3xl mx-auto p-4 md:p-8 space-y-8"
+      >
+        
+        {/* HERO SECTION */}
+        <motion.div variants={fadeSlideUp} className="flex flex-col items-center justify-center pt-6 pb-2 space-y-4 text-center">
+          <div className="relative">
+            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#FF7A00] to-[#FF004D] blur-md opacity-30 animate-pulse"></div>
+            <Avatar className="w-24 h-24 border-2 border-background shadow-xl relative z-10">
+              <AvatarImage src="" alt="Profile" />
+              <AvatarFallback className="text-3xl font-bold bg-gradient-to-br from-[#FF7A00] to-[#FF004D] text-white">
+                {getInitials(currentName)}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold tracking-tight">{currentName}</h1>
+            <p className="text-muted-foreground font-medium">{currentEmail}</p>
+          </div>
+        </motion.div>
 
-      {!profile ? (
-        <ProfileFormSkeleton />
-      ) : (
-        <>
-          <UserProfileForm profile={profile} />
-          <AddressManager addresses={profile.addresses} />
-        </>
-      )}
+        {/* ACCOUNT DETAILS FORM */}
+        <motion.div variants={fadeSlideUp}>
+          <Card className="border-border/40 shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
+            <CardHeader className="pb-6">
+              <CardTitle className="text-xl">Account Details</CardTitle>
+              <CardDescription>Update your personal information.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="relative flex items-center">
+                            <User className="absolute left-3.5 h-5 w-5 text-muted-foreground" />
+                            <Input 
+                              placeholder="Full Name" 
+                              className="pl-11 focus-visible:ring-[#FF7A00]" 
+                              {...field} 
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="relative flex items-center">
+                            <Mail className="absolute left-3.5 h-5 w-5 text-muted-foreground" />
+                            <Input 
+                              type="email"
+                              placeholder="Email Address" 
+                              className="pl-11 focus-visible:ring-[#FF7A00]" 
+                              {...field} 
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="relative flex items-center">
+                            <Phone className="absolute left-3.5 h-5 w-5 text-muted-foreground" />
+                            <Input 
+                              type="tel"
+                              placeholder="Phone Number" 
+                              className="pl-11 focus-visible:ring-[#FF7A00]" 
+                              {...field} 
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="pt-2 md:flex md:justify-end">
+                    <Button 
+                      type="submit" 
+                      disabled={isSubmitting}
+                      className="w-full md:w-auto bg-gradient-to-r from-[#FF7A00] to-[#FF004D] hover:opacity-90 text-white font-medium shadow-md transition-opacity"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        "Save Changes"
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* SAVED ADDRESSES */}
+        <motion.div variants={fadeSlideUp}>
+          <Card className="border-border/40 shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl">Saved Addresses</CardTitle>
+                  <CardDescription>Manage locations for Puja services.</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {addresses.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 px-4 border-2 border-dashed border-border/60 rounded-xl bg-muted/30">
+                  <MapPin className="h-10 w-10 text-muted-foreground/50 mb-3" />
+                  <p className="text-muted-foreground text-sm mb-4">No saved addresses found.</p>
+                  <Button variant="outline" className="border-primary/20 text-primary hover:bg-primary/5">
+                    Add New Address
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <AnimatePresence>
+                    {addresses.map((address) => (
+                      <motion.div
+                        key={address.id}
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="flex items-center p-4 rounded-xl border border-border/50 bg-background/50 hover:bg-muted/30 transition-colors group"
+                      >
+                        <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-muted/50 border border-border/40 mr-4">
+                          {renderIcon(address.type)}
+                        </div>
+                        <div className="flex-1 min-w-0 mr-4">
+                          <h4 className="font-semibold text-foreground capitalize truncate">{address.label}</h4>
+                          <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
+                            {address.address_line}
+                          </p>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground opacity-50 group-hover:opacity-100 transition-opacity">
+                              <MoreVertical className="h-4 w-4" />
+                              <span className="sr-only">Open menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuItem>
+                              <Edit2 className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                              onClick={() => setAddresses(addresses.filter(a => a.id !== address.id))}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                  
+                  <div className="pt-3">
+                    <Button variant="outline" className="w-full border-dashed border-2 text-muted-foreground hover:text-foreground">
+                      <MapPin className="mr-2 h-4 w-4" />
+                      Add New Address
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+        
+      </motion.div>
     </div>
   );
 }
