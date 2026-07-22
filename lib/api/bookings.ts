@@ -58,7 +58,7 @@ export async function requestBooking(payload: UberBookingRequestPayload) {
 export async function getNearbyRequests(
   lat: number,
   lng: number,
-  radius_km = 20
+  radius_km = 200
 ) {
   const { data } = await api.get<BroadcastBookingDoc[]>(
     "/bookings/nearby-requests",

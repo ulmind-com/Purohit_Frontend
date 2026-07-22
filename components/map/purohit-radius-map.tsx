@@ -14,6 +14,8 @@ interface PurohitRadiusMapProps {
   className?: string;
 }
 
+const LIBRARIES: "places"[] = ["places"];
+
 /** Read-only "driver app" map: current position + live service radius. */
 export function PurohitRadiusMap({
   center,
@@ -25,6 +27,7 @@ export function PurohitRadiusMap({
   const { isLoaded, loadError } = useJsApiLoader({
     id: "purohit-booking-google-maps",
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    libraries: LIBRARIES,
   });
 
   if (!GOOGLE_MAPS_API_KEY) {

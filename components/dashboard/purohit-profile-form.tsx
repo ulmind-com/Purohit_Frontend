@@ -37,7 +37,7 @@ const schema = z.object({
   mobile_number: z.string().min(10).max(15),
   expertise: z.array(z.enum(EXPERTISE_OPTIONS)).min(1, "Select at least one"),
   price: z.coerce.number().gt(0),
-  service_radius_km: z.coerce.number().min(1).max(100),
+  service_radius_km: z.coerce.number().min(1).max(200),
 });
 type FormValues = z.infer<typeof schema>;
 
@@ -177,7 +177,7 @@ export function PurohitProfileForm({ profile }: { profile: PurohitResponse }) {
                     <FormControl>
                       <Slider
                         min={1}
-                        max={50}
+                        max={200}
                         step={1}
                         value={[field.value]}
                         onValueChange={([v]) => field.onChange(v)}

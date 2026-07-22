@@ -47,6 +47,20 @@ export function LocationMapPicker({
     libraries: LIBRARIES,
   });
 
+  useEffect(() => {
+    // Suppress Google Maps API deprecation warnings from cluttering the Next.js dev console
+    const originalWarn = console.warn;
+    console.warn = (...args) => {
+      if (typeof args[0] === "string" && args[0].includes("google.maps.")) {
+        return;
+      }
+      originalWarn.apply(console, args);
+    };
+    return () => {
+      console.warn = originalWarn;
+    };
+  }, []);
+
   const [marker, setMarker] = useState<PickedLocation>(
     value ?? { ...DEFAULT_MAP_CENTER, formattedAddress: "" }
   );
