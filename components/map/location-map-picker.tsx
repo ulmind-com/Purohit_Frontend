@@ -15,9 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { DEFAULT_MAP_CENTER, GOOGLE_MAPS_API_KEY } from "@/lib/constants";
+import { GOOGLE_MAPS_LOADER_OPTIONS } from "@/lib/google-maps-loader";
 import { useGeolocation } from "@/hooks/useGeolocation";
-
-const LIBRARIES: "places"[] = ["places"];
 
 export interface PickedLocation {
   lat: number;
@@ -41,11 +40,7 @@ export function LocationMapPicker({
   mapHeight = "320px",
   radiusKm,
 }: LocationMapPickerProps) {
-  const { isLoaded, loadError } = useJsApiLoader({
-    id: "purohit-booking-google-maps",
-    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-    libraries: LIBRARIES,
-  });
+  const { isLoaded, loadError } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);
 
   useEffect(() => {
     // Suppress Google Maps API deprecation warnings from cluttering the Next.js dev console

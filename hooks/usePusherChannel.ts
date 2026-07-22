@@ -34,7 +34,10 @@ export function usePusherChannel<T>(
   onEvent: (data: T) => void
 ) {
   const callbackRef = useRef(onEvent);
-  callbackRef.current = onEvent;
+  
+  useEffect(() => {
+    callbackRef.current = onEvent;
+  }, [onEvent]);
 
   useEffect(() => {
     if (!channelName) return;

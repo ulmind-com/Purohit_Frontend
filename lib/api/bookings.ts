@@ -45,6 +45,8 @@ export interface UberBookingRequestPayload {
   ceremony_type: string;
   location: GeoJSONPoint;
   budget: number;
+  scheduled_start_time?: string;
+  scheduled_end_time?: string;
 }
 
 export async function requestBooking(payload: UberBookingRequestPayload) {

@@ -104,7 +104,7 @@ export default function LandingPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
             >
-              <Card className="glass-panel h-full">
+              <Card className="h-full">
                 <CardContent className="pt-6">
                   <div className="saffron-gradient mb-4 flex size-10 items-center justify-center rounded-xl text-white">
                     <feature.icon className="size-5" />

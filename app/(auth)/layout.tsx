@@ -57,8 +57,9 @@ export default function AuthLayout({
         </div>
       </div>
 
-      {/* Form panel */}
-      <div className="flex items-center justify-center bg-background p-6 sm:p-10">
+      {/* Form panel — intentionally no opaque background so the aurora
+          blobs behind show through around the glass card. */}
+      <div className="flex items-center justify-center p-6 sm:p-10">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

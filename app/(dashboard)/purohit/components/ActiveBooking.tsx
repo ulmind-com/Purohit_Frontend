@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
-import Pusher from 'pusher-js';
+import { usePusherChannel } from '@/hooks/usePusherChannel';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useBookingStore } from '@/store/useBookingStore';
 import { api } from '@/lib/api/axios';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { LiveTrackingPanel } from '@/components/booking/live-tracking-panel';
 
 export function ActiveBooking() {
   const { profile: user } = useAuthStore();
@@ -27,27 +28,18 @@ export function ActiveBooking() {
   const [isInitiating, setIsInitiating] = useState(false);
   const controls = useAnimation();
 
-  useEffect(() => {
-    if (!user?._id) return;
+  const channelName = user?._id ? `purohit_${user._id}` : null;
 
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-    });
-
-    const channel = pusher.subscribe(`purohit_${user._id}`);
-
-    channel.bind('booking_completed', (data: { booking_id: string }) => {
+  usePusherChannel<{ booking_id: string }>(
+    channelName,
+    'booking_completed',
+    (data) => {
       if (activeBooking && data.booking_id === activeBooking._id) {
         setBookingStatus('COMPLETED');
         toast.success("Verification successful! Booking is now complete.");
       }
-    });
-
-    return () => {
-      channel.unbind_all();
-      pusher.unsubscribe(`purohit_${user._id}`);
-    };
-  }, [user?._id, activeBooking, setBookingStatus]);
+    }
+  );
 
   const handleEndPuja = async () => {
     if (!activeBooking) return;
@@ -91,7 +83,7 @@ export function ActiveBooking() {
 
   if (bookingStatus === 'COMPLETION_PENDING') {
     return (
-      <Card className="max-w-md mx-auto mt-8 border-primary/20 shadow-lg">
+      <Card className="max-w-md mx-auto mt-8 trip-sheet border-none">
         <CardHeader className="text-center">
           <CardTitle>Verify Completion</CardTitle>
           <CardDescription>
@@ -110,10 +102,10 @@ export function ActiveBooking() {
               disabled={isVerifying}
             >
               <InputOTPGroup>
-                <InputOTPSlot index={0} className="w-12 h-14 text-2xl" />
-                <InputOTPSlot index={1} className="w-12 h-14 text-2xl" />
-                <InputOTPSlot index={2} className="w-12 h-14 text-2xl" />
-                <InputOTPSlot index={3} className="w-12 h-14 text-2xl" />
+                <InputOTPSlot index={0} className="w-12 h-14 text-2xl rounded-xl" />
+                <InputOTPSlot index={1} className="w-12 h-14 text-2xl rounded-xl" />
+                <InputOTPSlot index={2} className="w-12 h-14 text-2xl rounded-xl" />
+                <InputOTPSlot index={3} className="w-12 h-14 text-2xl rounded-xl" />
               </InputOTPGroup>
             </InputOTP>
           </motion.div>
@@ -145,7 +137,7 @@ export function ActiveBooking() {
 
   if (bookingStatus === 'COMPLETED') {
     return (
-      <Card className="max-w-md mx-auto mt-8">
+      <Card className="max-w-md mx-auto mt-8 trip-sheet border-none">
         <CardHeader>
           <CardTitle className="text-green-600">Booking Completed</CardTitle>
           <CardDescription>
@@ -157,8 +149,8 @@ export function ActiveBooking() {
             <span className="font-medium text-muted-foreground">Total Earnings</span>
             <span className="text-xl font-bold">₹{activeBooking.total_amount}</span>
           </div>
-          <Button 
-            className="w-full mt-6"
+          <Button
+            className="w-full mt-6 h-12 rounded-full text-base font-semibold"
             onClick={() => setBookingStatus('FINISHED')} // Move to past bookings view
           >
             Go to Dashboard
@@ -169,35 +161,48 @@ export function ActiveBooking() {
   }
 
   return (
-    <Card className="mb-6">
-      <CardHeader>
-        <CardTitle>Current Ceremony</CardTitle>
-        <CardDescription>
-          {activeBooking.ceremony_type}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex justify-between p-4 bg-muted/30 rounded-lg">
-          <span className="text-muted-foreground">Status</span>
-          <span className="font-semibold text-primary">{bookingStatus || activeBooking.status}</span>
-        </div>
-        
-        {/* End Puja Button */}
-        <Button 
-          className="w-full h-12 text-lg font-semibold"
-          onClick={handleEndPuja}
-          disabled={isInitiating}
-        >
-          {isInitiating ? (
-            <>
-              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-              Initiating...
-            </>
-          ) : (
-            "End Puja"
-          )}
-        </Button>
-      </CardContent>
-    </Card>
+    <div className="space-y-6 mb-6">
+      <Card className="trip-sheet border-none">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+          <CardTitle>Current Ceremony</CardTitle>
+          <span className="status-pill">
+            <span className="size-1.5 rounded-full bg-saffron-500 animate-pulse" />
+            {bookingStatus || activeBooking.status}
+          </span>
+          </div>
+          <CardDescription>
+            {activeBooking.ceremony_type}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* End Puja Button */}
+          <Button
+            className="w-full h-12 rounded-full text-lg font-semibold"
+            onClick={handleEndPuja}
+            disabled={isInitiating}
+          >
+            {isInitiating ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Initiating...
+              </>
+            ) : (
+              "End Puja"
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {user?._id && (
+        <LiveTrackingPanel
+          bookingId={activeBooking._id}
+          purohitId={user._id}
+          userId={activeBooking.user_id}
+          destination={activeBooking.location}
+          viewerRole="purohit"
+        />
+      )}
+    </div>
   );
 }

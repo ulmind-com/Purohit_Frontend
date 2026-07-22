@@ -135,7 +135,11 @@ export function PurohitDashboard() {
 
       {/* Bento top row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="glass-panel sm:col-span-2 lg:col-span-2">
+        <Card
+          className={`trip-sheet border-none sm:col-span-2 lg:col-span-2 transition-shadow ${
+            isOnline ? "ring-2 ring-saffron-500/40" : ""
+          }`}
+        >
           <CardContent className="flex items-center justify-between gap-4 py-6">
             <OnlineToggle />
           </CardContent>
@@ -162,7 +166,7 @@ export function PurohitDashboard() {
         <Card className="lg:col-span-2">
           <CardContent className="p-4">
             <h3 className="mb-3 flex items-center gap-1.5 font-medium">
-              <Radar className="size-4 text-saffron-500" />
+              <Radar className={`size-4 text-saffron-500 ${isOnline ? "animate-pulse" : ""}`} />
               Nearby requests
             </h3>
 
@@ -202,13 +206,15 @@ function StatCard({
   value: string;
 }) {
   return (
-    <Card>
-      <CardContent className="py-6">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Icon className="size-4" />
-          <span className="text-sm">{label}</span>
+    <Card >
+      <CardContent className="flex items-center gap-3 py-6">
+        <div className="saffron-gradient flex size-10 shrink-0 items-center justify-center rounded-xl text-white">
+          <Icon className="size-5" />
         </div>
-        <p className="mt-2 text-2xl font-semibold">{value}</p>
+        <div className="min-w-0">
+          <p className="text-xs text-muted-foreground">{label}</p>
+          <p className="truncate text-xl font-semibold">{value}</p>
+        </div>
       </CardContent>
     </Card>
   );
@@ -238,16 +244,39 @@ function NearbyRequestsList({
           key={req._id}
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between gap-3 rounded-xl border border-border p-3"
+          className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-muted/30 p-3 transition-colors hover:border-saffron-400/50"
         >
-          <div className="min-w-0">
-            <p className="truncate font-medium">{req.ceremony_type}</p>
-            <p className="text-xs text-muted-foreground">
-              ₹{req.budget}
-              {req.distance_in_km != null && ` · ${req.distance_in_km.toFixed(1)} km away`}
-            </p>
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <div className="saffron-gradient flex size-9 shrink-0 items-center justify-center rounded-full text-white">
+              <Wallet className="size-4" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-medium">{req.ceremony_type}</p>
+              <div className="mt-0.5 flex flex-col gap-0.5">
+                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  ₹{req.budget}
+                  {req.distance_in_km != null && ` · ${req.distance_in_km.toFixed(1)} km away`}
+                </p>
+                {req.scheduled_start_time && req.scheduled_end_time && (
+                  <p className="mt-1 w-fit rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium text-foreground">
+                    {new Intl.DateTimeFormat('en-US', {
+                      month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+                    }).format(new Date(req.scheduled_start_time))}
+                    {" - "}
+                    {new Intl.DateTimeFormat('en-US', {
+                      hour: 'numeric', minute: '2-digit'
+                    }).format(new Date(req.scheduled_end_time))}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
-          <Button size="sm" onClick={() => onAccept(req._id)} disabled={isAccepting}>
+          <Button
+            size="sm"
+            className="rounded-full"
+            onClick={() => onAccept(req._id)}
+            disabled={isAccepting}
+          >
             {isAccepting ? <Loader2 className="size-3.5 animate-spin" /> : <CalendarCheck className="size-3.5" />}
             Accept
           </Button>

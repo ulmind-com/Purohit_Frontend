@@ -11,7 +11,7 @@ import { PurohitSignupForm } from "@/components/auth/purohit-signup-form";
 export default function SignupPage() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-      <Card className="border-none shadow-none sm:border sm:shadow-sm">
+      <Card className="">
         <CardHeader>
           <CardTitle className="text-2xl">Create your account</CardTitle>
           <CardDescription>

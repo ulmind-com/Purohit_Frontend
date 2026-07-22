@@ -5,10 +5,13 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { format, addHours, parse } from "date-fns";
 import {
   ArrowLeft,
   ArrowRight,
+  CalendarIcon,
   CheckCircle2,
+  Clock,
   Loader2,
   MapPin,
   PartyPopper,
@@ -24,6 +27,15 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -45,9 +57,17 @@ import { ApiError } from "@/lib/api/axios";
 import type { BookingAcceptedEvent } from "@/types";
 import { cn } from "@/lib/utils";
 
-type WizardStep = "puja" | "location" | "searching" | "matched" | "timeout";
+type WizardStep = "puja" | "schedule" | "location" | "searching" | "matched" | "timeout";
 
 const SEARCH_TIMEOUT_MS = 45_000;
+
+const TIME_OPTIONS = [
+  "06:00 AM", "06:30 AM", "07:00 AM", "07:30 AM", "08:00 AM", "08:30 AM", 
+  "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
+  "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM",
+  "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM",
+  "06:00 PM", "06:30 PM", "07:00 PM", "07:30 PM", "08:00 PM", "08:30 PM"
+];
 
 export function UserBookingWizard() {
   const [step, setStep] = useState<WizardStep>("puja");
@@ -62,6 +82,7 @@ export function UserBookingWizard() {
     mode: "onChange",
     defaultValues: {
       budget: 2100,
+      durationHours: 1,
     },
   });
 
@@ -99,19 +120,36 @@ export function UserBookingWizard() {
     };
   }, []);
 
-  async function goToLocation() {
+  async function goToSchedule() {
     const valid = await form.trigger(["ceremonyType", "budget"]);
+    if (valid) setStep("schedule");
+  }
+
+  async function goToLocation() {
+    const valid = await form.trigger(["date", "time", "durationHours"]);
     if (valid) setStep("location");
   }
 
   async function startSearching() {
     const valid = await form.trigger(["location"]);
     if (!valid) return;
-    setStep("searching");
+    
     const values = form.getValues();
+    
+    // Combine Date and Time into UTC ISO strings
+    const parsedTime = parse(values.time, "hh:mm a", new Date());
+    const scheduledStartTime = new Date(values.date);
+    scheduledStartTime.setHours(parsedTime.getHours(), parsedTime.getMinutes(), 0, 0);
+    
+    const scheduledEndTime = addHours(scheduledStartTime, values.durationHours);
+
+    setStep("searching");
+    
     requestMutation.mutate({
       ceremony_type: values.ceremonyType,
       budget: values.budget,
+      scheduled_start_time: scheduledStartTime.toISOString(),
+      scheduled_end_time: scheduledEndTime.toISOString(),
       location: {
         type: "Point",
         coordinates: [values.location.lng, values.location.lat],
@@ -127,7 +165,7 @@ export function UserBookingWizard() {
   return (
     <div className="mx-auto max-w-2xl">
       <StepIndicator
-        step={["puja", "location", "searching", "matched"].indexOf(
+        step={["puja", "schedule", "location", "searching", "matched"].indexOf(
           step === "timeout" ? "searching" : step
         )}
       />
@@ -150,21 +188,33 @@ export function UserBookingWizard() {
                   render={({ field }) => (
                     <FormItem>
                       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                        {CEREMONY_TYPES.map((type) => (
-                          <button
-                            key={type}
-                            type="button"
-                            onClick={() => field.onChange(type)}
-                            className={cn(
-                              "rounded-xl border p-4 text-left text-sm font-medium transition-all hover:border-saffron-400 hover:shadow-sm",
-                              field.value === type
-                                ? "border-saffron-500 bg-saffron-50 text-saffron-900 shadow-sm dark:bg-saffron-950/30 dark:text-saffron-100"
-                                : "border-border bg-card"
-                            )}
-                          >
-                            {type}
-                          </button>
-                        ))}
+                        {CEREMONY_TYPES.map((type) => {
+                          const selected = field.value === type;
+                          return (
+                            <button
+                              key={type}
+                              type="button"
+                              onClick={() => field.onChange(type)}
+                              className={cn(
+                                "relative rounded-2xl border p-4 text-left text-sm font-medium transition-all hover:border-saffron-400 hover:shadow-sm",
+                                selected
+                                  ? "glass border-saffron-500 bg-saffron-50/70 text-saffron-900 dark:bg-saffron-950/30 dark:text-saffron-100"
+                                  : "border-border bg-card"
+                              )}
+                            >
+                              {type}
+                              {selected && (
+                                <motion.span
+                                  initial={{ scale: 0, opacity: 0 }}
+                                  animate={{ scale: 1, opacity: 1 }}
+                                  className="saffron-gradient absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full text-white shadow-sm"
+                                >
+                                  <CheckCircle2 className="size-3.5" />
+                                </motion.span>
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
                       <FormMessage />
                     </FormItem>
@@ -188,11 +238,150 @@ export function UserBookingWizard() {
                   )}
                 />
 
-                <Button type="button" className="w-full" size="lg" onClick={goToLocation}>
+                <Button
+                  type="button"
+                  className="h-12 w-full rounded-full text-base font-semibold"
+                  size="lg"
+                  onClick={goToSchedule}
+                >
                   Continue <ArrowRight className="size-4" />
                 </Button>
               </form>
             </Form>
+          </StepShell>
+        )}
+
+        {step === "schedule" && (
+          <StepShell key="schedule">
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-xl font-semibold">When do you need the Purohit?</h2>
+                <p className="text-sm text-muted-foreground">
+                  Select a date, start time, and estimated duration.
+                </p>
+              </div>
+
+              <Form {...form}>
+                <form className="space-y-6">
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    <FormField
+                      control={form.control}
+                      name="date"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Date</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                    "w-full pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value ? (
+                                    format(field.value, "PPP")
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto size-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                disabled={(date) =>
+                                  date < new Date(new Date().setHours(0, 0, 0, 0))
+                                }
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="time"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Start Time</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a time" />
+                                <Clock className="absolute right-3 size-4 opacity-50" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {TIME_OPTIONS.map((time) => (
+                                <SelectItem key={time} value={time}>
+                                  {time}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="durationHours"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Estimated Duration (Hours)</FormLabel>
+                        <Select
+                          onValueChange={(val) => field.onChange(parseInt(val))}
+                          defaultValue={field.value?.toString()}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select duration" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="1">1 Hour</SelectItem>
+                            <SelectItem value="2">2 Hours</SelectItem>
+                            <SelectItem value="3">3 Hours</SelectItem>
+                            <SelectItem value="4">4 Hours</SelectItem>
+                            <SelectItem value="5">5 Hours</SelectItem>
+                            <SelectItem value="6">6+ Hours</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </form>
+              </Form>
+
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-12 rounded-full px-6"
+                  onClick={() => setStep("puja")}
+                >
+                  <ArrowLeft className="size-4" /> Back
+                </Button>
+                <Button
+                  type="button"
+                  className="h-12 flex-1 rounded-full text-base font-semibold"
+                  size="lg"
+                  onClick={goToLocation}
+                >
+                  Continue <ArrowRight className="size-4" />
+                </Button>
+              </div>
+            </div>
           </StepShell>
         )}
 
@@ -240,10 +429,20 @@ export function UserBookingWizard() {
               </Form>
 
               <div className="flex gap-3">
-                <Button type="button" variant="outline" onClick={() => setStep("puja")}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-12 rounded-full px-6"
+                  onClick={() => setStep("schedule")}
+                >
                   <ArrowLeft className="size-4" /> Back
                 </Button>
-                <Button type="button" className="flex-1" size="lg" onClick={startSearching}>
+                <Button
+                  type="button"
+                  className="h-12 flex-1 rounded-full text-base font-semibold"
+                  size="lg"
+                  onClick={startSearching}
+                >
                   Find a Purohit <ArrowRight className="size-4" />
                 </Button>
               </div>
@@ -277,7 +476,9 @@ export function UserBookingWizard() {
                   search again in a few minutes.
                 </p>
               </div>
-              <Button onClick={retrySearch}>Try again</Button>
+              <Button onClick={retrySearch} className="h-12 rounded-full px-8 text-base font-semibold">
+                Try again
+              </Button>
             </div>
           </StepShell>
         )}
@@ -300,7 +501,7 @@ function StepShell({ children }: { children: React.ReactNode }) {
       exit={{ opacity: 0, x: -16 }}
       transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
     >
-      <Card className="glass-panel">
+      <Card className="trip-sheet border-none">
         <CardContent className="p-6 sm:p-8">{children}</CardContent>
       </Card>
     </motion.div>
@@ -381,7 +582,7 @@ function MatchedPanel({
         Booking ID: <span className="font-mono">{bookingId}</span>
       </div>
 
-      <Button asChild className="w-full" size="lg">
+      <Button asChild className="h-12 w-full rounded-full text-base font-semibold" size="lg">
         <Link href="/user/bookings">View my bookings</Link>
       </Button>
     </div>

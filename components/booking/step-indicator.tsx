@@ -1,42 +1,37 @@
 import { cn } from "@/lib/utils";
 
-const STEPS = ["Puja", "Location", "Matching", "Confirmed"];
+const STEPS = ["Puja", "Schedule", "Location", "Matching", "Confirmed"];
 
 export function StepIndicator({ step }: { step: number }) {
+  const progressPct = STEPS.length > 1 ? (step / (STEPS.length - 1)) * 100 : 0;
+
   return (
-    <div className="mb-8 flex items-center justify-center gap-2">
-      {STEPS.map((label, i) => (
-        <div key={label} className="flex items-center gap-2">
-          <div
-            className={cn(
-              "flex size-7 items-center justify-center rounded-full text-xs font-semibold transition-colors",
-              i < step
-                ? "saffron-gradient text-white"
-                : i === step
-                  ? "border-2 border-saffron-500 text-saffron-600 dark:text-saffron-400"
-                  : "bg-muted text-muted-foreground"
-            )}
-          >
-            {i + 1}
-          </div>
+    <div className="mx-auto mb-8 max-w-2xl">
+      <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+        <span className="text-foreground">{STEPS[step] ?? STEPS[STEPS.length - 1]}</span>
+        <span>
+          Step {Math.min(step + 1, STEPS.length)} of {STEPS.length}
+        </span>
+      </div>
+      <div className="relative mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+        <div
+          className="saffron-gradient h-full rounded-full transition-all duration-500 ease-out"
+          style={{ width: `${progressPct}%` }}
+        />
+      </div>
+      <div className="mt-2 hidden justify-between sm:flex">
+        {STEPS.map((label, i) => (
           <span
+            key={label}
             className={cn(
-              "hidden text-sm sm:inline",
-              i === step ? "font-medium text-foreground" : "text-muted-foreground"
+              "text-[11px]",
+              i <= step ? "font-medium text-foreground" : "text-muted-foreground"
             )}
           >
             {label}
           </span>
-          {i < STEPS.length - 1 && (
-            <div
-              className={cn(
-                "h-px w-6 sm:w-10",
-                i < step ? "bg-saffron-400" : "bg-border"
-              )}
-            />
-          )}
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

@@ -14,6 +14,13 @@ export const bookingWizardSchema = z.object({
   ceremonyType: z.enum(CEREMONY_TYPES, {
     message: "Choose a ceremony type",
   }),
+  date: z.date({
+    error: "A date is required.",
+  }),
+  time: z.string({
+    error: "A start time is required.",
+  }),
+  durationHours: z.number().min(1, "Duration must be at least 1 hour"),
   budget: z.number().gt(0, "Enter an offered dakshina amount"),
   location: bookingLocationSchema,
 });

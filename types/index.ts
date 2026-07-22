@@ -88,10 +88,13 @@ export interface BookingResponse {
   ceremony_type: string;
   booking_date: string;
   location: string;
+  scheduled_start_time?: string;
+  scheduled_end_time?: string;
   notes: string | null;
   user_id: string;
   status: BookingStatus;
   total_amount: number;
+  completion_otp?: string;
   created_at: string;
   updated_at: string;
 }
@@ -104,6 +107,8 @@ export interface BroadcastBookingDoc {
   location: GeoJSONPoint;
   budget: number;
   status: "SEARCHING" | "ACCEPTED";
+  scheduled_start_time?: string;
+  scheduled_end_time?: string;
   purohit_id?: string;
   created_at: string;
   updated_at: string;
@@ -139,9 +144,18 @@ export interface ApiErrorBody {
 export interface NewBookingRequestEvent {
   booking_id: string;
   ceremony_type: string;
+  scheduled_start_time?: string;
+  scheduled_end_time?: string;
 }
 
 export interface BookingAcceptedEvent {
   booking_id: string;
   purohit_id: string;
+}
+
+/** Emitted on every PATCH /purohits/me location update while the Purohit has an active booking. */
+export interface PurohitLocationUpdateEvent {
+  booking_id: string;
+  lat: number;
+  lng: number;
 }

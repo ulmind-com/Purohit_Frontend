@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { AppProviders } from "@/providers/app-providers";
+import { AuroraBackground } from "@/components/shared/aurora-background";
 
 // Bound to `--font-sans` (not `--font-geist-sans`) because app/globals.css's
 // shadcn `@theme` block reads `--font-sans` directly.
@@ -44,6 +45,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <AuroraBackground />
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

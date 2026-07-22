@@ -2,12 +2,13 @@
 
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Pusher from 'pusher-js';
+import { usePusherChannel } from '@/hooks/usePusherChannel';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useBookingStore } from '@/store/useBookingStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { LiveTrackingPanel } from '@/components/booking/live-tracking-panel';
 
 export function ActiveBooking() {
   const { profile: user } = useAuthStore();
@@ -19,53 +20,58 @@ export function ActiveBooking() {
     setCurrentOtp 
   } = useBookingStore();
 
-  useEffect(() => {
-    if (!user?._id) return;
+  const channelName = user?._id ? `user_${user._id}` : null;
 
-    // Initialize Pusher
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-    });
-
-    const channel = pusher.subscribe(`user_${user._id}`);
-
-    // Listen for OTP generation
-    channel.bind('otp_generated', (data: { booking_id: string; otp: string }) => {
+  usePusherChannel<{ booking_id: string; otp: string }>(
+    channelName,
+    'otp_generated',
+    (data) => {
       if (activeBooking && data.booking_id === activeBooking._id) {
         setBookingStatus('COMPLETION_PENDING');
         setCurrentOtp(data.otp);
       }
-    });
+    }
+  );
 
-    // Listen for successful completion
-    channel.bind('booking_completed', (data: { booking_id: string }) => {
+  usePusherChannel<{ booking_id: string }>(
+    channelName,
+    'booking_completed',
+    (data) => {
       if (activeBooking && data.booking_id === activeBooking._id) {
         setBookingStatus('COMPLETED');
         setCurrentOtp(null);
       }
-    });
+    }
+  );
 
-    return () => {
-      channel.unbind_all();
-      pusher.unsubscribe(`user_${user._id}`);
-    };
-  }, [user?._id, activeBooking, setBookingStatus, setCurrentOtp]);
+  // Sync OTP from booking if already pending completion (e.g., after page refresh)
+  useEffect(() => {
+    if (activeBooking && (bookingStatus || activeBooking.status) === 'COMPLETION_PENDING' && !currentOtp && activeBooking.completion_otp) {
+      setCurrentOtp(activeBooking.completion_otp);
+    }
+  }, [activeBooking, bookingStatus, currentOtp, setCurrentOtp]);
 
   if (!activeBooking) return null;
 
+  const currentStatus = bookingStatus || activeBooking.status;
+  const showTracking =
+    activeBooking.purohit_id &&
+    (currentStatus === 'ACCEPTED' || currentStatus === 'Confirmed' || currentStatus === 'COMPLETION_PENDING');
+
   return (
     <>
-      <Card className="mb-6">
+      <Card className="mb-6 trip-sheet border-none">
         <CardHeader>
-          <CardTitle>Active Booking: {activeBooking.ceremony_type}</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>{activeBooking.ceremony_type}</CardTitle>
+            <span className="status-pill">
+              <span className="size-1.5 rounded-full bg-saffron-500 animate-pulse" />
+              {currentStatus}
+            </span>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col space-y-4">
-            <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
-              <span className="font-medium">Status</span>
-              <span className="text-primary font-semibold">{bookingStatus || activeBooking.status}</span>
-            </div>
-            
             {activeBooking.purohit_id && (
               <div className="text-sm text-muted-foreground">
                 Purohit is on the way or currently performing the ceremony.
@@ -74,6 +80,18 @@ export function ActiveBooking() {
           </div>
         </CardContent>
       </Card>
+
+      {showTracking && activeBooking.purohit_id && (
+        <div className="mb-6">
+          <LiveTrackingPanel
+            bookingId={activeBooking._id}
+            purohitId={activeBooking.purohit_id}
+            userId={user!._id}
+            destination={activeBooking.location}
+            viewerRole="user"
+          />
+        </div>
+      )}
 
       <AnimatePresence>
         {bookingStatus === 'COMPLETION_PENDING' && currentOtp && (
@@ -87,7 +105,7 @@ export function ActiveBooking() {
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-background border shadow-2xl rounded-2xl p-8 max-w-sm w-full text-center space-y-6"
+              className="trip-sheet border-none p-8 max-w-sm w-full text-center space-y-6"
             >
               <div className="space-y-2">
                 <h2 className="text-2xl font-bold tracking-tight">End Puja</h2>
@@ -96,10 +114,15 @@ export function ActiveBooking() {
                 </p>
               </div>
               
-              <div className="py-6 bg-muted/50 rounded-xl">
-                <span className="text-5xl font-mono font-bold tracking-[0.25em] text-primary ml-4">
-                  {currentOtp}
-                </span>
+              <div className="flex justify-center gap-2 py-2">
+                {currentOtp.split("").map((digit, i) => (
+                  <span
+                    key={i}
+                    className="saffron-gradient flex size-14 items-center justify-center rounded-2xl text-3xl font-bold text-white"
+                  >
+                    {digit}
+                  </span>
+                ))}
               </div>
 
               <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
@@ -118,7 +141,7 @@ export function ActiveBooking() {
             animate={{ opacity: 1, scale: 1 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/30 dark:bg-black/40 backdrop-blur-md"
           >
-            <motion.div className="bg-background border shadow-2xl rounded-2xl p-8 max-w-sm w-full text-center space-y-6">
+            <motion.div className="trip-sheet border-none p-8 max-w-sm w-full text-center space-y-6">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -133,9 +156,9 @@ export function ActiveBooking() {
                   The ceremony has been successfully completed. May the blessings be with you.
                 </p>
               </div>
-              <Button 
+              <Button
                 onClick={() => setBookingStatus('FINISHED')}
-                className="w-full"
+                className="h-12 w-full rounded-full text-base font-semibold"
               >
                 Done
               </Button>

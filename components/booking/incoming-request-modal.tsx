@@ -88,6 +88,17 @@ export function IncomingRequestModal({
             <p className="mt-1 text-2xl font-semibold">
               {request?.ceremony_type ?? "Ceremony"}
             </p>
+            {request?.scheduled_start_time && request?.scheduled_end_time && (
+              <div className="mt-2 text-sm text-white/90 bg-white/10 rounded-md py-1 px-3 inline-block">
+                {new Intl.DateTimeFormat('en-US', {
+                  month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+                }).format(new Date(request.scheduled_start_time))}
+                {" - "}
+                {new Intl.DateTimeFormat('en-US', {
+                  hour: 'numeric', minute: '2-digit'
+                }).format(new Date(request.scheduled_end_time))}
+              </div>
+            )}
           </div>
 
           <p className="text-xs text-white/75">

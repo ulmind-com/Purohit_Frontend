@@ -4,6 +4,7 @@ import { Circle, GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/ap
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { GOOGLE_MAPS_API_KEY } from "@/lib/constants";
+import { GOOGLE_MAPS_LOADER_OPTIONS } from "@/lib/google-maps-loader";
 import { cn } from "@/lib/utils";
 
 interface PurohitRadiusMapProps {
@@ -14,8 +15,6 @@ interface PurohitRadiusMapProps {
   className?: string;
 }
 
-const LIBRARIES: "places"[] = ["places"];
-
 /** Read-only "driver app" map: current position + live service radius. */
 export function PurohitRadiusMap({
   center,
@@ -24,11 +23,7 @@ export function PurohitRadiusMap({
   height = "420px",
   className,
 }: PurohitRadiusMapProps) {
-  const { isLoaded, loadError } = useJsApiLoader({
-    id: "purohit-booking-google-maps",
-    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-    libraries: LIBRARIES,
-  });
+  const { isLoaded, loadError } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);
 
   if (!GOOGLE_MAPS_API_KEY) {
     return (
