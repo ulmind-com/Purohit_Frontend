@@ -1,0 +1,14 @@
+<svg viewBox="272 166 480 630" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PujaConnect logo mark">
+  <defs>
+    <linearGradient id="mark" gradientUnits="userSpaceOnUse" x1="332" y1="226" x2="692" y2="736">
+      <stop offset="0" stop-color="#FFA51F"/>
+      <stop offset="0.5" stop-color="#F26522"/>
+      <stop offset="1" stop-color="#B3122A"/>
+    </linearGradient>
+  </defs>
+
+  <path fill="url(#mark)" fill-rule="evenodd"
+    d="M512 736 L361.1 504.1 A180 180 0 1 1 662.9 504.1 L512 736 Z
+       M512 276 C556 336 574 381 512 446 C450 381 468 336 512 276 Z
+       M430 466 Q512 452 594 466 Q512 496 430 466 Z"/>
+</svg>
