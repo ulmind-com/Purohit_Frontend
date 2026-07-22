@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,6 +36,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuthStore } from "@/store/useAuthStore";
+import type { UserResponse, Address } from "@/types";
+import { ProfileFormSkeleton } from "@/components/shared/loading-skeletons";
 
 // Zod Validation Schema
 const profileSchema = z.object({
@@ -44,14 +47,6 @@ const profileSchema = z.object({
   phone: z.string().regex(/^\d{10}$/, "Phone must be exactly 10 digits"),
 });
 type ProfileFormValues = z.infer<typeof profileSchema>;
-
-// Dummy Data Types
-type Address = {
-  id: string;
-  label: string;
-  address_line: string;
-  type: "home" | "work" | "other";
-};
 
 // Animation Variants
 const staggerContainer: Variants = {
@@ -68,31 +63,27 @@ const fadeSlideUp: Variants = {
 };
 
 export default function UserProfilePage() {
-  // Dummy State for UI Demonstration
+  const profile = useAuthStore((s) => s.profile) as UserResponse | null;
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [addresses, setAddresses] = useState<Address[]>([
-    {
-      id: "1",
-      label: "Home",
-      address_line: "B-402, Lotus Apartments, New Town, Kolkata 700156",
-      type: "home"
-    },
-    {
-      id: "2",
-      label: "Office",
-      address_line: "Tech Park, Sector 5, Salt Lake, Kolkata 700091",
-      type: "work"
-    }
-  ]);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: "Rohan Sharma",
-      email: "rohan.sharma@example.com",
-      phone: "9876543210",
+      name: profile?.name || "",
+      email: profile?.email || "",
+      phone: profile?.mobile_number || "",
     },
   });
+
+  useEffect(() => {
+    if (profile) {
+      form.reset({
+        name: profile.name,
+        email: profile.email,
+        phone: profile.mobile_number,
+      });
+    }
+  }, [profile, form]);
 
   const onSubmit = async (data: ProfileFormValues) => {
     setIsSubmitting(true);
@@ -114,12 +105,15 @@ export default function UserProfilePage() {
   const currentName = form.watch("name");
   const currentEmail = form.watch("email");
 
-  const renderIcon = (type: string) => {
-    switch (type) {
-      case "home": return <Home className="w-5 h-5 text-muted-foreground" />;
-      case "work": return <Briefcase className="w-5 h-5 text-muted-foreground" />;
-      default: return <MapPin className="w-5 h-5 text-muted-foreground" />;
-    }
+  if (!profile) {
+    return <ProfileFormSkeleton />;
+  }
+
+  const renderIcon = (title: string) => {
+    const t = title.toLowerCase();
+    if (t.includes("home")) return <Home className="w-5 h-5 text-muted-foreground" />;
+    if (t.includes("work") || t.includes("office")) return <Briefcase className="w-5 h-5 text-muted-foreground" />;
+    return <MapPin className="w-5 h-5 text-muted-foreground" />;
   };
 
   return (
@@ -136,9 +130,9 @@ export default function UserProfilePage() {
           <div className="relative">
             <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#FF7A00] to-[#FF004D] blur-md opacity-30 animate-pulse"></div>
             <Avatar className="w-24 h-24 border-2 border-background shadow-xl relative z-10">
-              <AvatarImage src="" alt="Profile" />
+              <AvatarImage src={profile.profile_picture || ""} alt="Profile" />
               <AvatarFallback className="text-3xl font-bold bg-gradient-to-br from-[#FF7A00] to-[#FF004D] text-white">
-                {getInitials(currentName)}
+                {getInitials(currentName || "User")}
               </AvatarFallback>
             </Avatar>
           </div>
@@ -189,6 +183,7 @@ export default function UserProfilePage() {
                               type="email"
                               placeholder="Email Address" 
                               className="pl-11 focus-visible:ring-[#FF7A00]" 
+                              disabled
                               {...field} 
                             />
                           </div>
@@ -251,7 +246,7 @@ export default function UserProfilePage() {
               </div>
             </CardHeader>
             <CardContent>
-              {addresses.length === 0 ? (
+              {!profile.addresses || profile.addresses.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 px-4 border-2 border-dashed border-border/60 rounded-xl bg-muted/30">
                   <MapPin className="h-10 w-10 text-muted-foreground/50 mb-3" />
                   <p className="text-muted-foreground text-sm mb-4">No saved addresses found.</p>
@@ -262,21 +257,21 @@ export default function UserProfilePage() {
               ) : (
                 <div className="space-y-3">
                   <AnimatePresence>
-                    {addresses.map((address) => (
+                    {profile.addresses.map((address) => (
                       <motion.div
-                        key={address.id}
+                        key={address.address_id}
                         initial={{ opacity: 0, scale: 0.98 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         className="flex items-center p-4 rounded-xl border border-border/50 bg-background/50 hover:bg-muted/30 transition-colors group"
                       >
                         <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-muted/50 border border-border/40 mr-4">
-                          {renderIcon(address.type)}
+                          {renderIcon(address.title)}
                         </div>
                         <div className="flex-1 min-w-0 mr-4">
-                          <h4 className="font-semibold text-foreground capitalize truncate">{address.label}</h4>
+                          <h4 className="font-semibold text-foreground capitalize truncate">{address.title}</h4>
                           <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
-                            {address.address_line}
+                            {address.street}, {address.city}, {address.state} {address.zip_code}
                           </p>
                         </div>
                         <DropdownMenu>
@@ -293,7 +288,7 @@ export default function UserProfilePage() {
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               className="text-destructive focus:bg-destructive/10 focus:text-destructive"
-                              onClick={() => setAddresses(addresses.filter(a => a.id !== address.id))}
+                              onClick={() => { toast.info("Delete functionality coming soon") }}
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
                               Delete
