@@ -17,7 +17,8 @@ export function ActiveBooking() {
     bookingStatus, 
     currentOtp, 
     setBookingStatus, 
-    setCurrentOtp 
+    setCurrentOtp,
+    resetBookingState 
   } = useBookingStore();
 
   const channelName = user?._id ? `user_${user._id}` : null;
@@ -94,7 +95,7 @@ export function ActiveBooking() {
       )}
 
       <AnimatePresence>
-        {bookingStatus === 'COMPLETION_PENDING' && currentOtp && (
+        {currentStatus === 'COMPLETION_PENDING' && currentOtp && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -135,7 +136,7 @@ export function ActiveBooking() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {bookingStatus === 'COMPLETED' && (
+        {currentStatus === 'COMPLETED' && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -157,7 +158,7 @@ export function ActiveBooking() {
                 </p>
               </div>
               <Button
-                onClick={() => setBookingStatus('FINISHED')}
+                onClick={() => resetBookingState()}
                 className="h-12 w-full rounded-full text-base font-semibold"
               >
                 Done

@@ -7,6 +7,12 @@ import { PUSHER_CLUSTER, PUSHER_KEY } from "@/lib/constants";
 
 let sharedPusherClient: Pusher | null = null;
 
+/**
+ * Tracks how many hook instances are subscribed to each channel.
+ * We only call `client.unsubscribe(channelName)` when the count drops to 0.
+ */
+const channelRefCounts = new Map<string, number>();
+
 /** One Pusher connection per browser tab, shared across every channel hook instance. */
 function getPusherClient(): Pusher | null {
   if (!PUSHER_KEY) return null;
@@ -50,13 +56,24 @@ export function usePusherChannel<T>(
       return;
     }
 
+    // Increment ref count for this channel
+    channelRefCounts.set(channelName, (channelRefCounts.get(channelName) ?? 0) + 1);
+
     const channel: Channel = client.subscribe(channelName);
     const handler = (data: T) => callbackRef.current(data);
     channel.bind(eventName, handler);
 
     return () => {
       channel.unbind(eventName, handler);
-      client.unsubscribe(channelName);
+      
+      // Decrement ref count; only unsubscribe when no more listeners remain
+      const count = (channelRefCounts.get(channelName) ?? 1) - 1;
+      if (count <= 0) {
+        channelRefCounts.delete(channelName);
+        client.unsubscribe(channelName);
+      } else {
+        channelRefCounts.set(channelName, count);
+      }
     };
   }, [channelName, eventName]);
 }

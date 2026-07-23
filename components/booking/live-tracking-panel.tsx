@@ -70,6 +70,7 @@ export function LiveTrackingPanel({
   useEffect(() => {
     if (purohitProfile && !purohitLocation) {
       const [lng, lat] = purohitProfile.location.coordinates;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPurohitLocation({ lat, lng });
     }
   }, [purohitProfile, purohitLocation]);

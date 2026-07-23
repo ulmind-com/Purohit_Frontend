@@ -41,6 +41,7 @@ export function PurohitSignupForm() {
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const radius = form.watch("service_radius_km");
 
   function onSubmit(values: PurohitSignupFormValues) {

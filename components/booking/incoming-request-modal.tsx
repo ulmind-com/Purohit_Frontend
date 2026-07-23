@@ -32,6 +32,7 @@ export function IncomingRequestModal({
 
   useEffect(() => {
     if (!request) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSecondsLeft(AUTO_DISMISS_SECONDS);
     const interval = setInterval(() => {
       setSecondsLeft((s) => {

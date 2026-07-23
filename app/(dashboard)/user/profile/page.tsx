@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
+import { updateMyProfile } from "@/lib/api/users";
 import { 
   User, 
   Mail, 
@@ -38,7 +39,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/store/useAuthStore";
-import type { UserResponse, Address } from "@/types";
+import type { UserResponse } from "@/types";
 import { ProfileFormSkeleton } from "@/components/shared/loading-skeletons";
 
 // Zod Validation Schema
@@ -91,10 +92,20 @@ export default function UserProfilePage() {
 
   const onSubmit = async (data: ProfileFormValues) => {
     setIsSubmitting(true);
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    toast.success("Profile updated successfully!");
+    try {
+      const updated = await updateMyProfile({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+      });
+      setProfile(updated);
+      toast.success("Profile updated successfully!");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to update profile";
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,8 +141,9 @@ export default function UserProfilePage() {
       const updatedUser = await response.json();
       setProfile(updatedUser);
       toast.success("Profile picture updated!");
-    } catch (error: any) {
-      toast.error(error.message || "Something went wrong uploading the image");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Something went wrong uploading the image";
+      toast.error(message);
     } finally {
       setIsUploadingPhoto(false);
       if (fileInputRef.current) {
@@ -149,6 +161,7 @@ export default function UserProfilePage() {
       .toUpperCase();
   };
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const currentName = form.watch("name");
   const currentEmail = form.watch("email");
 

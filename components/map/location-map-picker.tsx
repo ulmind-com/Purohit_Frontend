@@ -110,10 +110,9 @@ export function LocationMapPicker({
   }, [locate]);
 
   // Feed the resolved geolocation coords back into the map once available.
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once per new `coords` value only
   useEffect(() => {
     if (coords) reverseGeocode(coords.lat, coords.lng);
-  }, [coords]);
+  }, [coords, reverseGeocode]);
 
   if (!GOOGLE_MAPS_API_KEY) {
     return (

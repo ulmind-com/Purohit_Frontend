@@ -10,6 +10,7 @@ export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
   // Avoid a hydration mismatch: resolvedTheme is undefined until mounted.
   const [mounted, setMounted] = useState(false);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), []);
 
   return (

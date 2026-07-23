@@ -45,6 +45,7 @@ export function PurohitProfileForm({ profile }: { profile: PurohitResponse }) {
   const setProfile = useAuthStore((s) => s.setProfile);
 
   const form = useForm<FormValues>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(schema) as any,
     defaultValues: {
       name: profile.name,
@@ -68,6 +69,7 @@ export function PurohitProfileForm({ profile }: { profile: PurohitResponse }) {
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const radius = form.watch("service_radius_km");
   const [lng, lat] = profile.location.coordinates;
 

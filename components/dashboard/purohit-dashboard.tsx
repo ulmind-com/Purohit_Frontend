@@ -14,7 +14,6 @@ import {
 import { toast } from "sonner";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ApiErrorAlert } from "@/components/shared/api-error-alert";
@@ -25,7 +24,6 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useBookingStore } from "@/store/useBookingStore";
 import { usePusherChannel } from "@/hooks/usePusherChannel";
 import { acceptBooking, getNearbyRequests, getMyBookings } from "@/lib/api/bookings";
-import { getPurohitById } from "@/lib/api/purohits";
 import { ApiError } from "@/lib/api/axios";
 import type {
   BroadcastBookingDoc,
@@ -38,7 +36,6 @@ import { OnlineToggle } from "@/app/(dashboard)/purohit/components/OnlineToggle"
 
 export function PurohitDashboard() {
   const profile = useAuthStore((s) => s.profile) as PurohitResponse | null;
-  const setProfile = useAuthStore((s) => s.setProfile);
   const setActiveBooking = useBookingStore((s) => s.setActiveBooking);
   const queryClient = useQueryClient();
 

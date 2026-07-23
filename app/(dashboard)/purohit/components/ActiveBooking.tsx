@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { usePusherChannel } from '@/hooks/usePusherChannel';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -20,7 +20,8 @@ export function ActiveBooking() {
     bookingStatus,
     setBookingStatus,
     isVerifying,
-    setIsVerifying
+    setIsVerifying,
+    resetBookingState
   } = useBookingStore();
 
   const [otp, setOtp] = useState('');
@@ -49,8 +50,9 @@ export function ActiveBooking() {
       await api.post(`/bookings/${activeBooking._id}/initiate-completion`);
       setBookingStatus('COMPLETION_PENDING');
       toast.success("OTP sent to Yajman. Please ask them for it.");
-    } catch (err: any) {
-      toast.error(err.response?.data?.detail || "Failed to initiate completion");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to initiate completion";
+      toast.error(message);
     } finally {
       setIsInitiating(false);
     }
@@ -64,8 +66,8 @@ export function ActiveBooking() {
       setError(null);
       await api.post(`/bookings/${activeBooking._id}/verify-completion`, { otp: value });
       // The Pusher event will handle setting status to COMPLETED
-    } catch (err: any) {
-      const errMsg = err.response?.data?.detail || "Invalid OTP";
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "Invalid OTP";
       setError(errMsg);
       setOtp(''); // Clear input
       
@@ -81,7 +83,9 @@ export function ActiveBooking() {
 
   if (!activeBooking) return null;
 
-  if (bookingStatus === 'COMPLETION_PENDING') {
+  const currentStatus = bookingStatus || activeBooking.status;
+
+  if (currentStatus === 'COMPLETION_PENDING') {
     return (
       <Card className="max-w-md mx-auto mt-8 trip-sheet border-none">
         <CardHeader className="text-center">
@@ -135,7 +139,7 @@ export function ActiveBooking() {
     );
   }
 
-  if (bookingStatus === 'COMPLETED') {
+  if (currentStatus === 'COMPLETED') {
     return (
       <Card className="max-w-md mx-auto mt-8 trip-sheet border-none">
         <CardHeader>
@@ -151,7 +155,7 @@ export function ActiveBooking() {
           </div>
           <Button
             className="w-full mt-6 h-12 rounded-full text-base font-semibold"
-            onClick={() => setBookingStatus('FINISHED')} // Move to past bookings view
+            onClick={() => resetBookingState()} // Clear active booking and return to dashboard
           >
             Go to Dashboard
           </Button>

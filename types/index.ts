@@ -84,16 +84,16 @@ export type BookingStatus =
 
 export interface BookingResponse {
   _id: string;
-  purohit_id: string;
+  purohit_id?: string;
   ceremony_type: string;
-  booking_date: string;
   location: string;
   scheduled_start_time?: string;
   scheduled_end_time?: string;
   notes: string | null;
+  budget?: number;
   user_id: string;
   status: BookingStatus;
-  total_amount: number;
+  total_amount?: number;
   completion_otp?: string;
   created_at: string;
   updated_at: string;

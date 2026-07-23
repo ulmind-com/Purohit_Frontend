@@ -43,7 +43,7 @@ export function useLogin() {
       setProfile(profile);
       return { role };
     },
-    onSuccess: ({ role }, _vars, _ctx) => {
+    onSuccess: ({ role }) => {
       toast.success("Welcome back!", {
         description:
           role === "purohit"
