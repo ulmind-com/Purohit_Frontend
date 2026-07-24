@@ -45,6 +45,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { LocationMapPicker, type PickedLocation } from "@/components/map/location-map-picker";
+import { RapidoSearchingMap } from "@/components/booking/rapido-searching-map";
 import { StepIndicator } from "@/components/booking/step-indicator";
 import { SearchingRadar } from "@/components/booking/searching-radar";
 import { CEREMONY_TYPES } from "@/lib/constants";
@@ -56,7 +57,6 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { ApiError } from "@/lib/api/axios";
 import type { BookingAcceptedEvent } from "@/types";
 import { cn } from "@/lib/utils";
-
 import { Switch } from "@/components/ui/switch";
 import { Sparkles, Video } from "lucide-react";
 
@@ -576,16 +576,25 @@ export function UserBookingWizard() {
         )}
 
         {step === "searching" && (
-          <StepShell key="searching">
-            <div className="flex flex-col items-center py-6 text-center">
-              <SearchingRadar label="Searching for nearby Purohits..." />
-              <p className="mt-8 max-w-sm text-sm text-muted-foreground">
-                We&apos;ve broadcast your request to every verified Purohit within
-                range for <span className="font-medium text-foreground">{form.getValues("ceremonyType")}</span>.
-                The first to accept will be matched with you.
-              </p>
-            </div>
-          </StepShell>
+          <motion.div
+            key="searching"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.25 }}
+          >
+            <RapidoSearchingMap
+              userLocation={{
+                lat: form.getValues("location.lat"),
+                lng: form.getValues("location.lng"),
+                formattedAddress: form.getValues("location.formattedAddress"),
+              }}
+              ceremonyType={form.getValues("ceremonyType")}
+              budget={form.getValues("budget")}
+              isEPuja={form.getValues("isEPuja")}
+              onCancel={retrySearch}
+            />
+          </motion.div>
         )}
 
         {step === "timeout" && (
