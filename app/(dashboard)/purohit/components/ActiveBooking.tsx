@@ -182,7 +182,8 @@ export function ActiveBooking() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {Boolean(activeBooking.is_e_puja || activeBooking.sankalp_details) && (
+          {Boolean(activeBooking.is_e_puja || activeBooking.sankalp_details) &&
+           (currentStatus === 'ACCEPTED' || currentStatus === 'Confirmed') && (
             <Button
               asChild
               className="w-full h-12 rounded-full saffron-gradient font-semibold text-white shadow-lg transition-transform active:scale-95 mb-3"

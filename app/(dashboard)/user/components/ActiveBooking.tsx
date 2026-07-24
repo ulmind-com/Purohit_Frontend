@@ -80,7 +80,8 @@ export function ActiveBooking() {
               </div>
             )}
 
-            {Boolean(activeBooking.is_e_puja || activeBooking.sankalp_details) && (
+            {Boolean(activeBooking.is_e_puja || activeBooking.sankalp_details) &&
+             (currentStatus === 'ACCEPTED' || currentStatus === 'Confirmed' || currentStatus === 'COMPLETION_PENDING') && (
               <Button
                 asChild
                 className="h-12 w-full saffron-gradient font-semibold text-white shadow-lg transition-transform active:scale-95"
