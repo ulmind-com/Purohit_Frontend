@@ -10,9 +10,12 @@ import type {
 export interface DirectBookingPayload {
   purohit_id: string;
   ceremony_type: string;
-  booking_date: string; // ISO datetime
+  scheduled_start_time: string;
+  scheduled_end_time: string;
   location: string;
   notes?: string;
+  is_e_puja?: boolean;
+  sankalp_details?: import("@/types").SankalpDetails;
 }
 
 export async function createDirectBooking(payload: DirectBookingPayload) {
@@ -47,6 +50,8 @@ export interface UberBookingRequestPayload {
   budget: number;
   scheduled_start_time?: string;
   scheduled_end_time?: string;
+  is_e_puja?: boolean;
+  sankalp_details?: import("@/types").SankalpDetails;
 }
 
 export async function requestBooking(payload: UberBookingRequestPayload) {
@@ -84,5 +89,12 @@ export async function getBookingEta(
   const { data } = await api.get<ETAResponse>(`/bookings/${bookingId}/eta`, {
     params: { purohit_lat: purohitLat, purohit_lng: purohitLng },
   });
+  return data;
+}
+
+export async function getEPujaToken(bookingId: string) {
+  const { data } = await api.get<import("@/types").EPujaTokenResponse>(
+    `/bookings/${bookingId}/e-puja-token`
+  );
   return data;
 }

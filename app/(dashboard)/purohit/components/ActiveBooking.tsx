@@ -1,7 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
+import { Loader2, AlertCircle, Video } from 'lucide-react';
+import { toast } from 'sonner';
+
 import { usePusherChannel } from '@/hooks/usePusherChannel';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useBookingStore } from '@/store/useBookingStore';
@@ -9,8 +13,6 @@ import { api } from '@/lib/api/axios';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { Loader2, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
 import { LiveTrackingPanel } from '@/components/booking/live-tracking-panel';
 
 export function ActiveBooking() {
@@ -169,17 +171,28 @@ export function ActiveBooking() {
       <Card className="trip-sheet border-none">
         <CardHeader>
           <div className="flex items-center justify-between">
-          <CardTitle>Current Ceremony</CardTitle>
-          <span className="status-pill">
-            <span className="size-1.5 rounded-full bg-saffron-500 animate-pulse" />
-            {bookingStatus || activeBooking.status}
-          </span>
+            <CardTitle>Current Ceremony</CardTitle>
+            <span className="status-pill">
+              <span className="size-1.5 rounded-full bg-saffron-500 animate-pulse" />
+              {bookingStatus || activeBooking.status}
+            </span>
           </div>
           <CardDescription>
             {activeBooking.ceremony_type}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {Boolean(activeBooking.is_e_puja || activeBooking.sankalp_details) && (
+            <Button
+              asChild
+              className="w-full h-12 rounded-full saffron-gradient font-semibold text-white shadow-lg transition-transform active:scale-95 mb-3"
+            >
+              <Link href={`/purohit/bookings/${activeBooking._id}/e-puja`}>
+                <Video className="mr-2 size-5 animate-pulse" /> Join E-Puja Virtual Ceremony Call
+              </Link>
+            </Button>
+          )}
+
           {/* End Puja Button */}
           <Button
             className="w-full h-12 rounded-full text-lg font-semibold"

@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Loader2, CheckCircle2, Video } from 'lucide-react';
 import { usePusherChannel } from '@/hooks/usePusherChannel';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useBookingStore } from '@/store/useBookingStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LiveTrackingPanel } from '@/components/booking/live-tracking-panel';
 
@@ -77,6 +78,17 @@ export function ActiveBooking() {
               <div className="text-sm text-muted-foreground">
                 Purohit is on the way or currently performing the ceremony.
               </div>
+            )}
+
+            {Boolean(activeBooking.is_e_puja || activeBooking.sankalp_details) && (
+              <Button
+                asChild
+                className="h-12 w-full saffron-gradient font-semibold text-white shadow-lg transition-transform active:scale-95"
+              >
+                <Link href={`/user/bookings/${activeBooking._id}/e-puja`}>
+                  <Video className="mr-2 size-5 animate-pulse" /> Join E-Puja Virtual Call Room
+                </Link>
+              </Button>
             )}
           </div>
         </CardContent>

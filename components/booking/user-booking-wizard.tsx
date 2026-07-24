@@ -57,6 +57,9 @@ import { ApiError } from "@/lib/api/axios";
 import type { BookingAcceptedEvent } from "@/types";
 import { cn } from "@/lib/utils";
 
+import { Switch } from "@/components/ui/switch";
+import { Sparkles, Video } from "lucide-react";
+
 type WizardStep = "puja" | "schedule" | "location" | "searching" | "matched" | "timeout";
 
 const SEARCH_TIMEOUT_MS = 45_000;
@@ -75,7 +78,8 @@ export function UserBookingWizard() {
   const [matchedPurohitId, setMatchedPurohitId] = useState<string | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const userId = useAuthStore((s) => s.profile?._id);
+  const userProfile = useAuthStore((s) => s.profile);
+  const userId = userProfile?._id;
 
   const form = useForm<BookingWizardValues>({
     resolver: zodResolver(bookingWizardSchema),
@@ -83,6 +87,11 @@ export function UserBookingWizard() {
     defaultValues: {
       budget: 2100,
       durationHours: 1,
+      isEPuja: false,
+      yajmanName: userProfile?.name || "",
+      gotra: "",
+      purpose: "",
+      nakshatra: "",
     },
   });
 
@@ -144,12 +153,24 @@ export function UserBookingWizard() {
     const scheduledEndTime = addHours(scheduledStartTime, values.durationHours);
 
     setStep("searching");
-    
+
+    const isEPuja = values.isEPuja ?? false;
+    const sankalpDetails = isEPuja
+      ? {
+          yajman_name: values.yajmanName?.trim() || userProfile?.name || "Yajman",
+          gotra: values.gotra?.trim() || "Kashyap",
+          purpose: values.purpose?.trim() || `${values.ceremonyType} Sankalp`,
+          nakshatra: values.nakshatra?.trim() || undefined,
+        }
+      : undefined;
+
     requestMutation.mutate({
       ceremony_type: values.ceremonyType,
       budget: values.budget,
       scheduled_start_time: scheduledStartTime.toISOString(),
       scheduled_end_time: scheduledEndTime.toISOString(),
+      is_e_puja: isEPuja,
+      sankalp_details: sankalpDetails,
       location: {
         type: "Point",
         coordinates: [values.location.lng, values.location.lat],
@@ -237,6 +258,110 @@ export function UserBookingWizard() {
                     </FormItem>
                   )}
                 />
+
+                {/* E-Puja Virtual Ceremony Option Card */}
+                <div className="rounded-2xl border border-saffron-500/30 bg-gradient-to-br from-saffron-500/10 via-amber-500/5 to-transparent p-5 shadow-sm">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-11 items-center justify-center rounded-xl saffron-gradient text-white shadow-md">
+                        <Video className="size-5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-foreground">E-Puja Virtual Ceremony</h3>
+                          <Badge variant="secondary" className="gap-1 bg-saffron-500/15 text-saffron-600 dark:text-saffron-400 border-none text-[10px]">
+                            <Sparkles className="size-3" /> LiveKit 1-on-1 Call
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Perform Puja remotely with LiveKit High-Fidelity Video & Shankha/Ghanta Audio Mode
+                        </p>
+                      </div>
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="isEPuja"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-y-0">
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="scale-110"
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {form.watch("isEPuja") && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-4 pt-4 border-t border-saffron-500/20 space-y-4"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-saffron-600 dark:text-saffron-400">
+                          📜 Digital Sankalp Details (For Panditji Teleprompter)
+                        </span>
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <FormField
+                          control={form.control}
+                          name="yajmanName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs">Yajman Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="e.g. Rahul Sharma" {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="gotra"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs">Gotra</FormLabel>
+                              <FormControl>
+                                <Input placeholder="e.g. Kashyap" {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <FormField
+                          control={form.control}
+                          name="purpose"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs">Sankalp Purpose (Intention)</FormLabel>
+                              <FormControl>
+                                <Input placeholder="e.g. Family Health & Prosperity" {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="nakshatra"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs">Nakshatra (Optional)</FormLabel>
+                              <FormControl>
+                                <Input placeholder="e.g. Rohini" {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
 
                 <Button
                   type="button"

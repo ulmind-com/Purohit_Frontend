@@ -14,9 +14,11 @@ import type { PurohitResponse } from "@/types";
 export function OnlineToggle() {
   const profile = useAuthStore((s) => s.profile) as PurohitResponse | null;
   const setProfile = useAuthStore((s) => s.setProfile);
-  
+
   const [isPending, setIsPending] = useState(false);
   const watchIdRef = useRef<number | null>(null);
+  const hasToastedErrorRef = useRef<boolean>(false);
+  const lastCoordsRef = useRef<{ lat: number; lng: number } | null>(null);
 
   const isOnline = profile?.is_online ?? false;
 
@@ -30,7 +32,8 @@ export function OnlineToggle() {
         toast.success("You're online", {
           description: "Live matching engine activated. Standby for bookings.",
         });
-        startTracking();
+        hasToastedErrorRef.current = false;
+        startTracking(true);
       } else {
         toast.info("You're offline", {
           description: "Location tracking paused.",
@@ -41,83 +44,107 @@ export function OnlineToggle() {
     onError: (error) => {
       setIsPending(false);
       toast.error("Couldn't update status", {
-        description: error instanceof ApiError ? error.message : "Please check your connection.",
+        description:
+          error instanceof ApiError
+            ? error.message
+            : "Please check your connection.",
       });
     },
   });
 
   const locationMutation = useMutation({
-    mutationFn: ({ lat, lng }: { lat: number; lng: number }) => updateLocation(lat, lng),
+    mutationFn: ({ lat, lng }: { lat: number; lng: number }) =>
+      updateLocation(lat, lng),
     onSuccess: (updated) => {
-      // Silently update profile in store so map reflects it
       setProfile(updated);
     },
     onError: (err) => {
-      console.error("Failed to update real-time location:", err);
-    }
+      console.warn("Location sync warning:", err);
+    },
   });
 
-  // Track the most recent coordinates so we don't spam the API for micro-movements
-  const lastCoordsRef = useRef<{ lat: number; lng: number } | null>(null);
-
-  const startTracking = () => {
-    if (!navigator.geolocation) {
-      toast.error("Geolocation not supported by your browser");
+  const startTracking = (highAccuracy = true) => {
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      if (!hasToastedErrorRef.current) {
+        toast.error("Geolocation not supported by your browser");
+        hasToastedErrorRef.current = true;
+      }
       return;
     }
 
-    if (watchIdRef.current !== null) return; // Already watching
+    stopTracking();
+
+    const handleSuccess = (position: GeolocationPosition) => {
+      const { latitude, longitude } = position.coords;
+      const lastCoords = lastCoordsRef.current;
+
+      let shouldUpdate = true;
+      if (lastCoords) {
+        const dLat = Math.abs(latitude - lastCoords.lat);
+        const dLng = Math.abs(longitude - lastCoords.lng);
+        if (dLat < 0.0005 && dLng < 0.0005) {
+          shouldUpdate = false;
+        }
+      }
+
+      if (shouldUpdate) {
+        lastCoordsRef.current = { lat: latitude, lng: longitude };
+        locationMutation.mutate({ lat: latitude, lng: longitude });
+      }
+    };
+
+    const handleError = (error: GeolocationPositionError) => {
+      const errorMsg =
+        error.message ||
+        (error.code === 1
+          ? "Permission denied"
+          : error.code === 2
+          ? "Position unavailable"
+          : "Location request timed out");
+
+      console.warn(`[GPS Watch] Code ${error.code}: ${errorMsg}`);
+
+      // Fallback: If high accuracy timed out or failed, try standard accuracy
+      if (highAccuracy && (error.code === 2 || error.code === 3)) {
+        console.warn("[GPS Watch] Retrying with standard accuracy positioning...");
+        startTracking(false);
+        return;
+      }
+
+      if (!hasToastedErrorRef.current) {
+        hasToastedErrorRef.current = true;
+        toast.error("GPS tracking notice", {
+          description:
+            error.code === 1
+              ? "Location permission is required for real-time matching."
+              : "Using estimated location. Check browser location permissions.",
+        });
+      }
+    };
 
     watchIdRef.current = navigator.geolocation.watchPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        const lastCoords = lastCoordsRef.current;
-
-        // Calculate rough distance (approx) to avoid spamming the API
-        let shouldUpdate = true;
-        if (lastCoords) {
-          const dLat = Math.abs(latitude - lastCoords.lat);
-          const dLng = Math.abs(longitude - lastCoords.lng);
-          // Roughly 50 meters threshold
-          if (dLat < 0.0005 && dLng < 0.0005) {
-            shouldUpdate = false;
-          }
-        }
-
-        if (shouldUpdate) {
-          lastCoordsRef.current = { lat: latitude, lng: longitude };
-          locationMutation.mutate({ lat: latitude, lng: longitude });
-        }
-      },
-      (error) => {
-        console.error("GPS Watch error:", error);
-        toast.error("GPS tracking failed", {
-          description: "Please ensure location permissions are granted."
-        });
-        // Auto-toggle offline if GPS fails, but wait a bit before doing it
-      },
+      handleSuccess,
+      handleError,
       {
-        enableHighAccuracy: true,
-        maximumAge: 10000,
-        timeout: 5000,
+        enableHighAccuracy: highAccuracy,
+        maximumAge: 30000,
+        timeout: highAccuracy ? 15000 : 30000,
       }
     );
   };
 
   const stopTracking = () => {
-    if (watchIdRef.current !== null) {
+    if (watchIdRef.current !== null && typeof window !== "undefined") {
       navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
     }
   };
 
-  // Cleanup on unmount
   useEffect(() => {
-    // If the component mounts and the purohit is supposed to be online, restart tracking
     if (isOnline && watchIdRef.current === null) {
-      startTracking();
+      startTracking(true);
     }
-    
+
     return () => {
       stopTracking();
     };
@@ -130,13 +157,19 @@ export function OnlineToggle() {
         <p className="text-sm text-muted-foreground">Matching Engine</p>
         <p className="mt-1 flex items-center gap-2 text-xl font-semibold">
           <span
-            className={`size-2.5 rounded-full ${isOnline ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.7)]" : "bg-muted-foreground/40"}`}
+            className={`size-2.5 rounded-full ${
+              isOnline
+                ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.7)]"
+                : "bg-muted-foreground/40"
+            }`}
           />
           {isOnline ? "Online & Searching" : "Offline"}
         </p>
       </div>
-      <div className="flex items-center gap-2 relative">
-        {isPending && <Loader2 className="absolute -left-6 size-4 animate-spin text-muted-foreground" />}
+      <div className="relative flex items-center gap-2">
+        {isPending && (
+          <Loader2 className="absolute -left-6 size-4 animate-spin text-muted-foreground" />
+        )}
         <Switch
           checked={isOnline}
           disabled={isPending}

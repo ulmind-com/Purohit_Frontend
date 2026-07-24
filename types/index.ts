@@ -82,6 +82,21 @@ export type BookingStatus =
   | "ACCEPTED"
   | "COMPLETION_PENDING";
 
+export interface SankalpDetails {
+  yajman_name: string;
+  gotra: string;
+  purpose: string;
+  nakshatra?: string;
+}
+
+export interface EPujaTokenResponse {
+  token: string;
+  room_name: string;
+  livekit_url?: string;
+  role: Role;
+  sankalp_details?: SankalpDetails;
+}
+
 export interface BookingResponse {
   _id: string;
   purohit_id?: string;
@@ -95,6 +110,8 @@ export interface BookingResponse {
   status: BookingStatus;
   total_amount?: number;
   completion_otp?: string;
+  is_e_puja?: boolean;
+  sankalp_details?: SankalpDetails;
   created_at: string;
   updated_at: string;
 }
@@ -110,6 +127,8 @@ export interface BroadcastBookingDoc {
   scheduled_start_time?: string;
   scheduled_end_time?: string;
   purohit_id?: string;
+  is_e_puja?: boolean;
+  sankalp_details?: SankalpDetails;
   created_at: string;
   updated_at: string;
   accepted_at?: string;
