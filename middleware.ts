@@ -1,17 +1,22 @@
 import { NextResponse, type NextRequest } from "next/server";
-
+import createMiddleware from "next-intl/middleware";
 import { AUTH_COOKIE_NAME, ROLE_COOKIE_NAME } from "@/lib/constants";
+import { routing } from "@/navigation";
 
-/**
- * Edge-level route guard. The JWT itself is never verified here (that's the
- * FastAPI backend's job on every request) — this only checks for the
- * *presence* of the token/role cookies mirrored by `store/useAuthStore.ts`,
- * so an expired-but-present token still passes through and gets caught by
- * the axios 401 interceptor. This keeps the guard fast and dependency-free
- * at the edge while the backend remains the sole source of truth for auth.
- */
+const intlMiddleware = createMiddleware(routing);
+
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  // 1. First, process the locale routing
+  const response = intlMiddleware(request);
+
+  // 2. We extract the pathname ignoring the locale prefix to run auth checks
+  // next-intl automatically sets the x-next-intl-locale header to the resolved locale
+  const locale = response.headers.get("x-next-intl-locale") || routing.defaultLocale;
+  let pathname = request.nextUrl.pathname;
+  if (pathname.startsWith(`/${locale}`)) {
+    pathname = pathname.replace(`/${locale}`, "") || "/";
+  }
+
   const token = request.cookies.get(AUTH_COOKIE_NAME)?.value;
   const role = request.cookies.get(ROLE_COOKIE_NAME)?.value;
   const isAuthed = Boolean(token && role);
@@ -40,9 +45,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/user", request.url));
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {
-  matcher: ["/user/:path*", "/purohit/:path*", "/login", "/signup"],
+  // Skip all internal paths (_next), API routes, and static images
+  matcher: ["/((?!api|_next|.*\\..*).*)"],
 };

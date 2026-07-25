@@ -1,12 +1,14 @@
 import { UserBookingWizard } from "@/components/booking/user-booking-wizard";
+import { useTranslations } from "next-intl";
 
 export default function BookPage() {
+  const t = useTranslations("Booking");
   return (
     <div>
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Book a Puja</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{t("bookPujaTitle")}</h1>
         <p className="mt-1 text-muted-foreground">
-          Tell us what you need — we&apos;ll match you with a nearby Purohit instantly.
+          {t("bookPujaSubtitle")}
         </p>
       </div>
       <UserBookingWizard />

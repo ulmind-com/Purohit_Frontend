@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, Plus, Search, Sparkles, Loader2, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 import { getCeremonies, addCeremony, type Ceremony } from "@/lib/api/ceremonies";
@@ -29,6 +30,7 @@ interface CeremonySelectionProps {
 }
 
 export function CeremonySelection({ value, onChange }: CeremonySelectionProps) {
+  const t = useTranslations("Booking");
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -151,7 +153,7 @@ export function CeremonySelection({ value, onChange }: CeremonySelectionProps) {
               <div className="flex items-center gap-2">
                 <Search className="size-4 text-muted-foreground" />
                 <span className={cn("truncate", !value && "text-muted-foreground")}>
-                  {value || "Search or type a custom ceremony..."}
+                  {value || t("searchOrType")}
                 </span>
               </div>
               <ChevronDown className="size-4 shrink-0 opacity-50" />
@@ -162,13 +164,13 @@ export function CeremonySelection({ value, onChange }: CeremonySelectionProps) {
               shouldFilter={false} // We handle filtering via command input value internally
             >
               <CommandInput 
-                placeholder="Search ceremonies..." 
+                placeholder={t("searchCeremonies")} 
                 value={inputValue}
                 onValueChange={setInputValue}
               />
               <CommandList>
                 {/* Standard List */}
-                <CommandGroup heading="Suggestions">
+                <CommandGroup heading={t("suggestions")}>
                   {ceremonies
                     .filter(c => c.name.toLowerCase().includes(inputValue.toLowerCase()))
                     .map((ceremony) => (
@@ -186,7 +188,7 @@ export function CeremonySelection({ value, onChange }: CeremonySelectionProps) {
                     ))}
                   
                   {ceremonies.filter(c => c.name.toLowerCase().includes(inputValue.toLowerCase())).length === 0 && !inputValue && (
-                    <CommandEmpty>No ceremonies found.</CommandEmpty>
+                    <CommandEmpty>{t("noCeremoniesFound")}</CommandEmpty>
                   )}
                 </CommandGroup>
 
@@ -203,7 +205,7 @@ export function CeremonySelection({ value, onChange }: CeremonySelectionProps) {
                         <Sparkles className="size-4" />
                       )}
                       <span className="font-medium">
-                        Add <span className="font-bold">"{inputValue.trim()}"</span> as a new ceremony
+                        {t("addNewCeremony", { name: inputValue.trim() })}
                       </span>
                     </CommandItem>
                   </CommandGroup>
