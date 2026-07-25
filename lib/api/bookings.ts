@@ -98,3 +98,26 @@ export async function getEPujaToken(bookingId: string) {
   );
   return data;
 }
+
+export async function getAuspiciousDates(params: {
+  month: number;
+  year: number;
+  purpose: string;
+  lat: number;
+  lng: number;
+}) {
+  const { data } = await api.get<import("@/types").AuspiciousDatesResponse>(
+    "/bookings/auspicious-dates",
+    { params }
+  );
+  return data;
+}
+
+export async function getShubhMuhuratSlots(date: string, lat = 22.5726, lng = 88.3639) {
+  const { data } = await api.get<import("@/types").DayShubhMuhuratResponse>(
+    "/bookings/shubh-muhurat-slots",
+    { params: { date, lat, lng } }
+  );
+  return data;
+}
+

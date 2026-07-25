@@ -178,3 +178,27 @@ export interface PurohitLocationUpdateEvent {
   lat: number;
   lng: number;
 }
+
+/** Smart Muhurat Engine response */
+export interface AuspiciousDatesResponse {
+  geo_key: string;
+  month: number;
+  year: number;
+  purpose: string;
+  auspicious_dates: string[];
+}
+
+export interface ShubhTimeSlot {
+  time: string;
+  is_auspicious: boolean;
+  muhurat_name: string | null;
+  category: string | null;
+}
+
+export interface DayShubhMuhuratResponse {
+  date: string;
+  auspicious_count: number;
+  slots: ShubhTimeSlot[];
+  auspicious_summary: string[];
+}
+

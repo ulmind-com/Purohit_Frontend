@@ -48,6 +48,9 @@ import { LocationMapPicker, type PickedLocation } from "@/components/map/locatio
 import { RapidoSearchingMap } from "@/components/booking/rapido-searching-map";
 import { StepIndicator } from "@/components/booking/step-indicator";
 import { SearchingRadar } from "@/components/booking/searching-radar";
+import { SmartMuhuratCalendar } from "@/components/booking/SmartMuhuratCalendar";
+import { SmartMuhuratTimePicker } from "@/components/booking/SmartMuhuratTimePicker";
+import { DEFAULT_MAP_CENTER } from "@/lib/constants";
 import { CEREMONY_TYPES } from "@/lib/constants";
 import { bookingWizardSchema, type BookingWizardValues } from "@/lib/validators/booking";
 import { requestBooking } from "@/lib/api/bookings";
@@ -388,7 +391,19 @@ export function UserBookingWizard() {
 
               <Form {...form}>
                 <form className="space-y-6">
-                  <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="mb-6">
+                    <SmartMuhuratCalendar
+                      purpose={form.watch("ceremonyType")}
+                      lat={DEFAULT_MAP_CENTER.lat}
+                      lng={DEFAULT_MAP_CENTER.lng}
+                      selectedDate={form.watch("date")}
+                      onSelectDate={(date) => {
+                        form.setValue("date", date, { shouldValidate: true });
+                      }}
+                    />
+                  </div>
+
+                  <div className="space-y-6">
                     <FormField
                       control={form.control}
                       name="date"
@@ -435,27 +450,22 @@ export function UserBookingWizard() {
                       name="time"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Start Time</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select a time" />
-                                <Clock className="absolute right-3 size-4 opacity-50" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {TIME_OPTIONS.map((time) => (
-                                <SelectItem key={time} value={time}>
-                                  {time}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <FormControl>
+                            <SmartMuhuratTimePicker
+                              selectedDate={form.watch("date") || new Date()}
+                              selectedTime={field.value}
+                              onSelectTime={(time) => {
+                                field.onChange(time);
+                                form.setValue("time", time, { shouldValidate: true });
+                              }}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
                   </div>
+
 
                   <FormField
                     control={form.control}
