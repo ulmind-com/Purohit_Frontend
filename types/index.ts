@@ -13,12 +13,28 @@ export interface GeoJSONPoint {
 
 export interface Address {
   address_id: string;
-  title: string;
-  street: string;
+  tag: string;
+  flat: string | null;
+  area: string;
   city: string;
-  state: string;
-  zip_code: string;
+  pincode: string;
+  is_default: boolean;
   location: GeoJSONPoint;
+}
+
+export interface FamilyMember {
+  member_id: string;
+  name: string;
+  relation: string;
+  gotra: string | null;
+  rashi: string | null;
+}
+
+export interface CurrentDasha {
+  dasha_name: string;
+  end_date: string;
+  recommended_puja_name: string;
+  updated_at: string;
 }
 
 export interface UserResponse {
@@ -28,7 +44,14 @@ export interface UserResponse {
   mobile_number: string;
   fcm_device_token: string | null;
   profile_picture: string | null;
-  addresses: Address[];
+  gotra: string | null;
+  rashi: string | null;
+  dob: string | null;
+  birth_time: string | null;
+  birth_place: { lat: number; lng: number; address: string } | null;
+  family_members: FamilyMember[];
+  saved_addresses: Address[];
+  current_dasha: CurrentDasha | null;
   created_at: string;
   updated_at: string | null;
 }
@@ -38,6 +61,13 @@ export interface UserUpdatePayload {
   phone?: string;
   email?: string;
   profile_picture?: string;
+  gotra?: string | null;
+  rashi?: string | null;
+  dob?: string | null;
+  birth_time?: string | null;
+  birth_place?: { lat: number; lng: number; address: string } | null;
+  family_members?: FamilyMember[] | null;
+  saved_addresses?: Address[] | null;
 }
 
 export const EXPERTISE_OPTIONS = [
@@ -243,5 +273,11 @@ export interface DayShubhMuhuratResponse {
   auspicious_count: number;
   slots: ShubhTimeSlot[];
   auspicious_summary: string[];
+}
+
+export interface AstrologyMetadata {
+  rashis: string[];
+  gotras: string[];
+  nakshatras: string[];
 }
 
