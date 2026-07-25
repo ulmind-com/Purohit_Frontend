@@ -23,6 +23,7 @@ import { useBookingStore } from "@/store/useBookingStore";
 import type { UserResponse } from "@/types";
 import { STATUS_BADGE_VARIANT } from "@/lib/booking-status";
 import { ActiveBooking } from "@/app/(dashboard)/user/components/ActiveBooking";
+import { AstrologyCrossSell } from "@/components/dashboard/AstrologyCrossSell";
 import { useEffect } from "react";
 
 export function UserBentoDashboard() {
@@ -61,6 +62,8 @@ export function UserBentoDashboard() {
     <div className="space-y-6">
       {/* Active Booking Component */}
       <ActiveBooking />
+
+      <AstrologyCrossSell />
       
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Hero CTA tile */}
@@ -100,7 +103,7 @@ export function UserBentoDashboard() {
       <StatTile
         icon={MapPin}
         label="Saved addresses"
-        value={String((profile.addresses || []).length)}
+        value={String((profile.saved_addresses || []).length)}
         delay={0.1}
       />
 

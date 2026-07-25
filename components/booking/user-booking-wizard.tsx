@@ -48,6 +48,7 @@ import { LocationMapPicker, type PickedLocation } from "@/components/map/locatio
 import { RapidoSearchingMap } from "@/components/booking/rapido-searching-map";
 import { StepIndicator } from "@/components/booking/step-indicator";
 import { SearchingRadar } from "@/components/booking/searching-radar";
+import { CeremonySelection } from "@/components/booking/CeremonySelection";
 import { SmartMuhuratCalendar } from "@/components/booking/SmartMuhuratCalendar";
 import { SmartMuhuratTimePicker } from "@/components/booking/SmartMuhuratTimePicker";
 import { DEFAULT_MAP_CENTER } from "@/lib/constants";
@@ -58,7 +59,9 @@ import { getPurohitById } from "@/lib/api/purohits";
 import { usePusherChannel } from "@/hooks/usePusherChannel";
 import { useAuthStore } from "@/store/useAuthStore";
 import { ApiError } from "@/lib/api/axios";
-import type { BookingAcceptedEvent } from "@/types";
+import { fetchMyProfile } from "@/lib/api/users";
+import type { BookingAcceptedEvent, Address, UserResponse } from "@/types";
+import { GotraCombobox, NakshatraSelect } from "@/components/shared/astrology-inputs";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Sparkles, Video } from "lucide-react";
@@ -84,19 +87,39 @@ export function UserBookingWizard() {
   const userProfile = useAuthStore((s) => s.profile);
   const userId = userProfile?._id;
 
+  const { data: freshProfile } = useQuery({
+    queryKey: ["user-profile", userId],
+    queryFn: fetchMyProfile,
+    enabled: !!userId,
+  });
+
+  const profile = (freshProfile || userProfile) as UserResponse | null;
+
   const form = useForm<BookingWizardValues>({
     resolver: zodResolver(bookingWizardSchema),
     mode: "onChange",
     defaultValues: {
-      budget: 2100,
+      ceremonyType: "Puja",
+      offered_dakshina: 2100,
       durationHours: 1,
       isEPuja: false,
-      yajmanName: userProfile?.name || "",
-      gotra: "",
+      yajmanName: profile?.name || "",
+      gotra: profile?.gotra || "",
       purpose: "",
-      nakshatra: "",
+      nakshatra: profile?.rashi || "",
     },
   });
+
+  useEffect(() => {
+    if (profile) {
+      form.reset({
+        ...form.getValues(),
+        yajmanName: form.getValues("yajmanName") || profile.name,
+        gotra: form.getValues("gotra") || profile.gotra || "",
+        nakshatra: form.getValues("nakshatra") || profile.rashi || "",
+      });
+    }
+  }, [profile, form]);
 
   const requestMutation = useMutation({
     mutationFn: requestBooking,
@@ -133,7 +156,7 @@ export function UserBookingWizard() {
   }, []);
 
   async function goToSchedule() {
-    const valid = await form.trigger(["ceremonyType", "budget"]);
+    const valid = await form.trigger(["ceremonyType", "offered_dakshina"]);
     if (valid) setStep("schedule");
   }
 
@@ -160,10 +183,10 @@ export function UserBookingWizard() {
     const isEPuja = values.isEPuja ?? false;
     const sankalpDetails = isEPuja
       ? {
-          yajman_name: values.yajmanName?.trim() || userProfile?.name || "Yajman",
-          gotra: values.gotra?.trim() || "Kashyap",
+          yajman_name: values.yajmanName?.trim() || profile?.name || "Yajman",
+          gotra: values.gotra?.trim() || profile?.gotra || "Kashyap",
           purpose: values.purpose?.trim() || `${values.ceremonyType} Sankalp`,
-          nakshatra: values.nakshatra?.trim() || undefined,
+          nakshatra: values.nakshatra?.trim() || profile?.rashi || undefined,
         }
       : undefined;
 
@@ -176,7 +199,7 @@ export function UserBookingWizard() {
 
     requestMutation.mutate({
       ceremony_type: values.ceremonyType,
-      budget: values.budget,
+      budget: values.offered_dakshina,
       scheduled_start_time: scheduledStartTime.toISOString(),
       scheduled_end_time: scheduledEndTime.toISOString(),
       is_e_puja: isEPuja,
@@ -221,35 +244,9 @@ export function UserBookingWizard() {
                   name="ceremonyType"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                        {CEREMONY_TYPES.map((type) => {
-                          const selected = field.value === type;
-                          return (
-                            <button
-                              key={type}
-                              type="button"
-                              onClick={() => field.onChange(type)}
-                              className={cn(
-                                "relative rounded-2xl border p-4 text-left text-sm font-medium transition-all hover:border-saffron-400 hover:shadow-sm",
-                                selected
-                                  ? "glass border-saffron-500 bg-saffron-50/70 text-saffron-900 dark:bg-saffron-950/30 dark:text-saffron-100"
-                                  : "border-border bg-card"
-                              )}
-                            >
-                              {type}
-                              {selected && (
-                                <motion.span
-                                  initial={{ scale: 0, opacity: 0 }}
-                                  animate={{ scale: 1, opacity: 1 }}
-                                  className="saffron-gradient absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full text-white shadow-sm"
-                                >
-                                  <CheckCircle2 className="size-3.5" />
-                                </motion.span>
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
+                      <FormControl>
+                        <CeremonySelection value={field.value} onChange={field.onChange} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -257,14 +254,23 @@ export function UserBookingWizard() {
 
                 <FormField
                   control={form.control}
-                  name="budget"
+                  name="offered_dakshina"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Offered Dakshina (₹)</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Wallet className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                          <Input type="number" min={1} className="pl-9" {...field} />
+                          <Input
+                            type="number"
+                            min={1}
+                            className="pl-9"
+                            {...field}
+                            onChange={(e) => {
+                              const val = e.target.valueAsNumber;
+                              field.onChange(isNaN(val) ? 0 : val);
+                            }}
+                          />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -340,7 +346,7 @@ export function UserBookingWizard() {
                             <FormItem>
                               <FormLabel className="text-xs">Gotra</FormLabel>
                               <FormControl>
-                                <Input placeholder="e.g. Kashyap" {...field} />
+                                <GotraCombobox value={field.value} onChange={field.onChange} />
                               </FormControl>
                             </FormItem>
                           )}
@@ -366,7 +372,7 @@ export function UserBookingWizard() {
                             <FormItem>
                               <FormLabel className="text-xs">Nakshatra (Optional)</FormLabel>
                               <FormControl>
-                                <Input placeholder="e.g. Rohini" {...field} />
+                                <NakshatraSelect value={field.value} onChange={field.onChange} />
                               </FormControl>
                             </FormItem>
                           )}
@@ -541,36 +547,89 @@ export function UserBookingWizard() {
               </div>
 
               <Form {...form}>
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <LocationMapPicker
-                          value={
-                            field.value
-                              ? {
-                                  lat: field.value.lat,
-                                  lng: field.value.lng,
-                                  formattedAddress: field.value.formattedAddress,
-                                }
-                              : undefined
-                          }
-                          onChange={(loc: PickedLocation) =>
-                            field.onChange({
-                              label: loc.formattedAddress || "Selected location",
-                              formattedAddress: loc.formattedAddress,
-                              lat: loc.lat,
-                              lng: loc.lng,
-                            })
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                <div className="space-y-4">
+                  {profile?.saved_addresses && profile.saved_addresses.length > 0 && (
+                    <div className="space-y-2">
+                      <FormLabel className="text-sm font-semibold">Saved Addresses</FormLabel>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {profile.saved_addresses.map((addr: Address) => {
+                          const isSelected = 
+                            form.watch("location")?.lat === addr.location.coordinates[1] &&
+                            form.watch("location")?.lng === addr.location.coordinates[0];
+
+                          return (
+                            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} key={addr.address_id}>
+                              <Card 
+                                className={cn(
+                                  "cursor-pointer transition-all border-2",
+                                  isSelected 
+                                    ? "border-saffron-500 bg-saffron-50/50 dark:bg-saffron-900/10 shadow-md" 
+                                    : "border-border/50 hover:border-saffron-300"
+                                )}
+                                onClick={() => {
+                                  form.setValue("location", {
+                                    label: addr.tag,
+                                    formattedAddress: `${addr.flat ? addr.flat + ", " : ""}${addr.area}, ${addr.city} - ${addr.pincode}`,
+                                    lat: addr.location.coordinates[1],
+                                    lng: addr.location.coordinates[0],
+                                  }, { shouldValidate: true });
+                                }}
+                              >
+                                <CardContent className="p-4 flex items-start gap-3">
+                                  <div className={cn("p-2 rounded-full", isSelected ? "bg-saffron-100 text-saffron-600" : "bg-muted text-muted-foreground")}>
+                                    <MapPin className="w-4 h-4" />
+                                  </div>
+                                  <div className="flex-1">
+                                    <h4 className={cn("font-semibold text-sm", isSelected ? "text-saffron-700 dark:text-saffron-400" : "")}>{addr.tag}</h4>
+                                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                                      {addr.flat ? addr.flat + ", " : ""}{addr.area}, {addr.city} - {addr.pincode}
+                                    </p>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   )}
-                />
+
+                  <div className="relative py-2">
+                    <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-muted" /></div>
+                    <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">Or pick on map</span></div>
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <LocationMapPicker
+                            value={
+                              field.value
+                                ? {
+                                    lat: field.value.lat,
+                                    lng: field.value.lng,
+                                    formattedAddress: field.value.formattedAddress,
+                                  }
+                                : undefined
+                            }
+                            onChange={(loc: PickedLocation) =>
+                              field.onChange({
+                                label: loc.formattedAddress || "Selected location",
+                                formattedAddress: loc.formattedAddress,
+                                lat: loc.lat,
+                                lng: loc.lng,
+                              })
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </Form>
 
               <div className="flex gap-3">
@@ -610,7 +669,7 @@ export function UserBookingWizard() {
                 formattedAddress: form.getValues("location.formattedAddress"),
               }}
               ceremonyType={form.getValues("ceremonyType")}
-              budget={form.getValues("budget")}
+              budget={form.getValues("offered_dakshina")}
               isEPuja={form.getValues("isEPuja")}
               onCancel={retrySearch}
             />

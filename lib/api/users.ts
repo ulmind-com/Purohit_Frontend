@@ -13,12 +13,17 @@ import type {
  * `UserResponse` — this is how we hydrate the profile right after login.
  */
 export async function fetchMyProfile() {
-  const { data } = await api.patch<UserResponse>("/users/me", {});
+  const { data } = await api.get<UserResponse>("/users/me");
   return data;
 }
 
 export async function updateMyProfile(payload: UserUpdatePayload) {
   const { data } = await api.patch<UserResponse>("/users/me", payload);
+  return data;
+}
+
+export async function getAstrologyInsights() {
+  const { data } = await api.get("/users/me/astrology-insights");
   return data;
 }
 
