@@ -28,6 +28,9 @@ export const bookingWizardSchema = z.object({
   gotra: z.string().optional(),
   purpose: z.string().optional(),
   nakshatra: z.string().optional(),
+  preferredLanguage: z.string().nullable().optional(),
+  preferredTradition: z.string().nullable().optional(),
 });
+
 
 export type BookingWizardValues = z.infer<typeof bookingWizardSchema>;

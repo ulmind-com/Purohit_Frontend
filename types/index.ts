@@ -51,12 +51,36 @@ export const EXPERTISE_OPTIONS = [
 
 export type Expertise = (typeof EXPERTISE_OPTIONS)[number];
 
+export const SUPPORTED_LANGUAGES = [
+  "Bengali",
+  "Hindi",
+  "Sanskrit",
+  "English",
+  "Telugu",
+  "Tamil",
+  "Marathi",
+] as const;
+
+export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
+
+export const PUJA_TRADITIONS = [
+  "Bengali",
+  "North Indian",
+  "South Indian",
+  "Arya Samaj",
+  "Vedic",
+] as const;
+
+export type PujaTradition = (typeof PUJA_TRADITIONS)[number];
+
 export interface PurohitResponse {
   _id: string;
   name: string;
   email: string;
   mobile_number: string;
   expertise: Expertise[];
+  languages?: SupportedLanguage[];
+  tradition?: PujaTradition;
   location: GeoJSONPoint;
   address_text: string | null;
   service_radius_km: number;
@@ -66,6 +90,20 @@ export interface PurohitResponse {
   is_online: boolean;
   fcm_device_token: string | null;
   created_at: string;
+}
+
+export interface PurohitUpdatePayload {
+  name?: string;
+  mobile_number?: string;
+  expertise?: Expertise[];
+  languages?: SupportedLanguage[];
+  tradition?: PujaTradition;
+  location?: GeoJSONPoint;
+  address_text?: string;
+  service_radius_km?: number;
+  price?: number;
+  is_available?: boolean;
+  is_online?: boolean;
 }
 
 export interface NearbyPurohitResponse extends PurohitResponse {
@@ -112,6 +150,8 @@ export interface BookingResponse {
   completion_otp?: string;
   is_e_puja?: boolean;
   sankalp_details?: SankalpDetails;
+  preferred_language?: SupportedLanguage | null;
+  preferred_tradition?: PujaTradition | null;
   created_at: string;
   updated_at: string;
 }
@@ -129,11 +169,14 @@ export interface BroadcastBookingDoc {
   purohit_id?: string;
   is_e_puja?: boolean;
   sankalp_details?: SankalpDetails;
+  preferred_language?: SupportedLanguage | null;
+  preferred_tradition?: PujaTradition | null;
   created_at: string;
   updated_at: string;
   accepted_at?: string;
   distance_in_km?: number;
 }
+
 
 export interface BookingHistoryResponse {
   booking_id: string;

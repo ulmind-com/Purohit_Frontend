@@ -52,7 +52,10 @@ export interface UberBookingRequestPayload {
   scheduled_end_time?: string;
   is_e_puja?: boolean;
   sankalp_details?: import("@/types").SankalpDetails;
+  preferred_language?: import("@/types").SupportedLanguage | null;
+  preferred_tradition?: import("@/types").PujaTradition | null;
 }
+
 
 export async function requestBooking(payload: UberBookingRequestPayload) {
   const { data } = await api.post<BroadcastBookingDoc>(

@@ -167,6 +167,13 @@ export function UserBookingWizard() {
         }
       : undefined;
 
+    const preferredLang = values.preferredLanguage && values.preferredLanguage !== "ANY"
+      ? (values.preferredLanguage as import("@/types").SupportedLanguage)
+      : null;
+    const preferredTrad = values.preferredTradition && values.preferredTradition !== "ANY"
+      ? (values.preferredTradition as import("@/types").PujaTradition)
+      : null;
+
     requestMutation.mutate({
       ceremony_type: values.ceremonyType,
       budget: values.budget,
@@ -174,12 +181,15 @@ export function UserBookingWizard() {
       scheduled_end_time: scheduledEndTime.toISOString(),
       is_e_puja: isEPuja,
       sankalp_details: sankalpDetails,
+      preferred_language: preferredLang,
+      preferred_tradition: preferredTrad,
       location: {
         type: "Point",
         coordinates: [values.location.lng, values.location.lat],
       },
     });
   }
+
 
   function retrySearch() {
     setBookingId(null);
