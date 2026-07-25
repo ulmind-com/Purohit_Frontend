@@ -8,6 +8,7 @@ import {
   LogOut,
   MapPinned,
   Settings,
+  Search,
   User as UserIcon,
 } from "lucide-react";
 
@@ -32,6 +33,7 @@ import type { Role } from "@/types";
 const NAV_LINKS: Record<Role, { href: string; label: any; icon: typeof LayoutGrid }[]> = {
   user: [
     { href: "/user", label: "home", icon: LayoutGrid },
+    { href: "/search", label: "search", icon: Search },
     { href: "/user/book", label: "book", icon: CalendarClock },
     { href: "/user/bookings", label: "bookings", icon: MapPinned },
     { href: "/user/profile", label: "profile", icon: UserIcon },

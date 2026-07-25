@@ -24,6 +24,7 @@
   },
   "Navigation": {
     "home": "Home",
+    "search": "Search",
     "dashboard": "Dashboard",
     "book": "Book",
     "bookings": "Bookings",
