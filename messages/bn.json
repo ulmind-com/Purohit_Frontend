@@ -24,6 +24,7 @@
   },
   "Navigation": {
     "home": "হোম",
+    "search": "খুঁজুন",
     "dashboard": "ড্যাশবোর্ড",
     "book": "বুক করুন",
     "bookings": "বুকিংগুলি",
