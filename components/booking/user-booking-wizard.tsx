@@ -48,6 +48,7 @@ import { LocationMapPicker, type PickedLocation } from "@/components/map/locatio
 import { RapidoSearchingMap } from "@/components/booking/rapido-searching-map";
 import { StepIndicator } from "@/components/booking/step-indicator";
 import { SearchingRadar } from "@/components/booking/searching-radar";
+import { CeremonySelection } from "@/components/booking/CeremonySelection";
 import { SmartMuhuratCalendar } from "@/components/booking/SmartMuhuratCalendar";
 import { SmartMuhuratTimePicker } from "@/components/booking/SmartMuhuratTimePicker";
 import { DEFAULT_MAP_CENTER } from "@/lib/constants";
@@ -88,7 +89,8 @@ export function UserBookingWizard() {
     resolver: zodResolver(bookingWizardSchema),
     mode: "onChange",
     defaultValues: {
-      budget: 2100,
+      ceremonyType: "Puja",
+      offered_dakshina: 2100,
       durationHours: 1,
       isEPuja: false,
       yajmanName: userProfile?.name || "",
@@ -133,7 +135,7 @@ export function UserBookingWizard() {
   }, []);
 
   async function goToSchedule() {
-    const valid = await form.trigger(["ceremonyType", "budget"]);
+    const valid = await form.trigger(["ceremonyType", "offered_dakshina"]);
     if (valid) setStep("schedule");
   }
 
@@ -176,7 +178,7 @@ export function UserBookingWizard() {
 
     requestMutation.mutate({
       ceremony_type: values.ceremonyType,
-      budget: values.budget,
+      budget: values.offered_dakshina,
       scheduled_start_time: scheduledStartTime.toISOString(),
       scheduled_end_time: scheduledEndTime.toISOString(),
       is_e_puja: isEPuja,
@@ -221,35 +223,9 @@ export function UserBookingWizard() {
                   name="ceremonyType"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                        {CEREMONY_TYPES.map((type) => {
-                          const selected = field.value === type;
-                          return (
-                            <button
-                              key={type}
-                              type="button"
-                              onClick={() => field.onChange(type)}
-                              className={cn(
-                                "relative rounded-2xl border p-4 text-left text-sm font-medium transition-all hover:border-saffron-400 hover:shadow-sm",
-                                selected
-                                  ? "glass border-saffron-500 bg-saffron-50/70 text-saffron-900 dark:bg-saffron-950/30 dark:text-saffron-100"
-                                  : "border-border bg-card"
-                              )}
-                            >
-                              {type}
-                              {selected && (
-                                <motion.span
-                                  initial={{ scale: 0, opacity: 0 }}
-                                  animate={{ scale: 1, opacity: 1 }}
-                                  className="saffron-gradient absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full text-white shadow-sm"
-                                >
-                                  <CheckCircle2 className="size-3.5" />
-                                </motion.span>
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
+                      <FormControl>
+                        <CeremonySelection value={field.value} onChange={field.onChange} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -257,14 +233,23 @@ export function UserBookingWizard() {
 
                 <FormField
                   control={form.control}
-                  name="budget"
+                  name="offered_dakshina"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Offered Dakshina (₹)</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Wallet className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                          <Input type="number" min={1} className="pl-9" {...field} />
+                          <Input
+                            type="number"
+                            min={1}
+                            className="pl-9"
+                            {...field}
+                            onChange={(e) => {
+                              const val = e.target.valueAsNumber;
+                              field.onChange(isNaN(val) ? 0 : val);
+                            }}
+                          />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -610,7 +595,7 @@ export function UserBookingWizard() {
                 formattedAddress: form.getValues("location.formattedAddress"),
               }}
               ceremonyType={form.getValues("ceremonyType")}
-              budget={form.getValues("budget")}
+              budget={form.getValues("offered_dakshina")}
               isEPuja={form.getValues("isEPuja")}
               onCancel={retrySearch}
             />

@@ -11,9 +11,7 @@ export const bookingLocationSchema = z.object({
 export type BookingLocationValue = z.infer<typeof bookingLocationSchema>;
 
 export const bookingWizardSchema = z.object({
-  ceremonyType: z.enum(CEREMONY_TYPES, {
-    message: "Choose a ceremony type",
-  }),
+  ceremonyType: z.string().min(2, "Choose or enter a ceremony type"),
   date: z.date({
     error: "A date is required.",
   }),
@@ -21,7 +19,7 @@ export const bookingWizardSchema = z.object({
     error: "A start time is required.",
   }),
   durationHours: z.number().min(1, "Duration must be at least 1 hour"),
-  budget: z.number().gt(0, "Enter an offered dakshina amount"),
+  offered_dakshina: z.number().min(101, "Minimum Dakshina is ₹101"),
   location: bookingLocationSchema,
   isEPuja: z.boolean().optional(),
   yajmanName: z.string().optional(),
