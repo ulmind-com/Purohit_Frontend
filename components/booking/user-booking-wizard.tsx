@@ -19,8 +19,9 @@ import {
   Star,
   Wallet,
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/navigation";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,6 +80,7 @@ const TIME_OPTIONS = [
 ];
 
 export function UserBookingWizard() {
+  const t = useTranslations("Booking");
   const [step, setStep] = useState<WizardStep>("puja");
   const [bookingId, setBookingId] = useState<string | null>(null);
   const [matchedPurohitId, setMatchedPurohitId] = useState<string | null>(null);
@@ -233,9 +235,9 @@ export function UserBookingWizard() {
             <Form {...form}>
               <form className="space-y-6">
                 <div>
-                  <h2 className="text-xl font-semibold">Select your ceremony</h2>
+                  <h2 className="text-xl font-semibold">{t("selectCeremony")}</h2>
                   <p className="text-sm text-muted-foreground">
-                    Choose the ritual you need a Purohit for.
+                    {t("chooseRitual")}
                   </p>
                 </div>
 
@@ -257,7 +259,7 @@ export function UserBookingWizard() {
                   name="offered_dakshina"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Offered Dakshina (₹)</FormLabel>
+                      <FormLabel>{t("offeredDakshina")}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Wallet className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -287,13 +289,13 @@ export function UserBookingWizard() {
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-foreground">E-Puja Virtual Ceremony</h3>
+                          <h3 className="font-semibold text-foreground">{t("ePujaVirtual")}</h3>
                           <Badge variant="secondary" className="gap-1 bg-saffron-500/15 text-saffron-600 dark:text-saffron-400 border-none text-[10px]">
                             <Sparkles className="size-3" /> LiveKit 1-on-1 Call
                           </Badge>
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          Perform Puja remotely with LiveKit High-Fidelity Video & Shankha/Ghanta Audio Mode
+                          {t("ePujaDesc")}
                         </p>
                       </div>
                     </div>
@@ -388,7 +390,7 @@ export function UserBookingWizard() {
                   size="lg"
                   onClick={goToSchedule}
                 >
-                  Continue <ArrowRight className="size-4" />
+                  {t("continueBtn")} <ArrowRight className="size-4" />
                 </Button>
               </form>
             </Form>
@@ -521,7 +523,7 @@ export function UserBookingWizard() {
                   className="h-12 rounded-full px-6"
                   onClick={() => setStep("puja")}
                 >
-                  <ArrowLeft className="size-4" /> Back
+                  <ArrowLeft className="size-4" /> {t("backBtn")}
                 </Button>
                 <Button
                   type="button"
@@ -529,7 +531,7 @@ export function UserBookingWizard() {
                   size="lg"
                   onClick={goToLocation}
                 >
-                  Continue <ArrowRight className="size-4" />
+                  {t("continueBtn")} <ArrowRight className="size-4" />
                 </Button>
               </div>
             </div>
@@ -639,7 +641,7 @@ export function UserBookingWizard() {
                   className="h-12 rounded-full px-6"
                   onClick={() => setStep("schedule")}
                 >
-                  <ArrowLeft className="size-4" /> Back
+                  <ArrowLeft className="size-4" /> {t("backBtn")}
                 </Button>
                 <Button
                   type="button"

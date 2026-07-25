@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "@/navigation";
+import { useTranslations } from "next-intl";
 import {
   CalendarClock,
   LayoutGrid,
@@ -13,6 +13,7 @@ import {
 
 import { Logo } from "@/components/shared/logo";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { LanguageSwitcher } from "@/components/navigation/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -28,17 +29,17 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useLogout } from "@/hooks/useAuth";
 import type { Role } from "@/types";
 
-const NAV_LINKS: Record<Role, { href: string; label: string; icon: typeof LayoutGrid }[]> = {
+const NAV_LINKS: Record<Role, { href: string; label: any; icon: typeof LayoutGrid }[]> = {
   user: [
-    { href: "/user", label: "Home", icon: LayoutGrid },
-    { href: "/user/book", label: "Book", icon: CalendarClock },
-    { href: "/user/bookings", label: "Bookings", icon: MapPinned },
-    { href: "/user/profile", label: "Profile", icon: UserIcon },
+    { href: "/user", label: "home", icon: LayoutGrid },
+    { href: "/user/book", label: "book", icon: CalendarClock },
+    { href: "/user/bookings", label: "bookings", icon: MapPinned },
+    { href: "/user/profile", label: "profile", icon: UserIcon },
   ],
   purohit: [
-    { href: "/purohit", label: "Home", icon: LayoutGrid },
-    { href: "/purohit/bookings", label: "Bookings", icon: MapPinned },
-    { href: "/purohit/profile", label: "Profile", icon: Settings },
+    { href: "/purohit", label: "home", icon: LayoutGrid },
+    { href: "/purohit/bookings", label: "bookings", icon: MapPinned },
+    { href: "/purohit/profile", label: "profile", icon: Settings },
   ],
 };
 
@@ -47,6 +48,7 @@ function isActive(pathname: string, href: string, role: Role) {
 }
 
 export function Navbar({ role }: { role: Role }) {
+  const t = useTranslations("Navigation");
   const pathname = usePathname();
   const profile = useAuthStore((s) => s.profile);
   const logout = useLogout();
@@ -86,7 +88,7 @@ export function Navbar({ role }: { role: Role }) {
                     )}
                   >
                     <link.icon className="size-4" />
-                    {link.label}
+                    {t(link.label)}
                   </Link>
                 );
               })}
@@ -94,6 +96,7 @@ export function Navbar({ role }: { role: Role }) {
           </div>
 
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -115,7 +118,7 @@ export function Navbar({ role }: { role: Role }) {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href={`/${role}/profile`}>
-                    <UserIcon /> Profile settings
+                    <UserIcon /> {t("profileSettings")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -123,7 +126,7 @@ export function Navbar({ role }: { role: Role }) {
                   variant="destructive"
                   onClick={() => logout.mutate()}
                 >
-                  <LogOut /> Sign out
+                  <LogOut /> {t("signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -159,7 +162,7 @@ export function Navbar({ role }: { role: Role }) {
                     active ? "text-foreground" : "text-muted-foreground"
                   )}
                 >
-                  {link.label}
+                  {t(link.label)}
                 </span>
               </Link>
             );

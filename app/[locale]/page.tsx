@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/navigation";
 import { motion } from "framer-motion";
 import { CalendarClock, MapPinned, ShieldCheck, Sparkles } from "lucide-react";
 

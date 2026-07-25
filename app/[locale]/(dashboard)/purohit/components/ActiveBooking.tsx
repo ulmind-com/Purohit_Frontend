@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from "@/navigation";
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { Loader2, AlertCircle, Video } from 'lucide-react';
 import { toast } from 'sonner';

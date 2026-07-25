@@ -30,9 +30,9 @@ import type {
   NewBookingRequestEvent,
   PurohitResponse,
 } from "@/types";
-import { ActiveBooking } from "@/app/(dashboard)/purohit/components/ActiveBooking";
+import { ActiveBooking } from "@/app/[locale]/(dashboard)/purohit/components/ActiveBooking";
 import { useEffect } from "react";
-import { OnlineToggle } from "@/app/(dashboard)/purohit/components/OnlineToggle";
+import { OnlineToggle } from "@/app/[locale]/(dashboard)/purohit/components/OnlineToggle";
 
 export function PurohitDashboard() {
   const profile = useAuthStore((s) => s.profile) as PurohitResponse | null;

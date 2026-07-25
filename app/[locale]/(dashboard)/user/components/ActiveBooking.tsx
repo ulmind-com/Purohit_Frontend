@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import Link from 'next/link';
+import { Link } from "@/navigation";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, CheckCircle2, Video } from 'lucide-react';
 import { usePusherChannel } from '@/hooks/usePusherChannel';

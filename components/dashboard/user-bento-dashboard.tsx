@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
@@ -22,11 +23,12 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useBookingStore } from "@/store/useBookingStore";
 import type { UserResponse } from "@/types";
 import { STATUS_BADGE_VARIANT } from "@/lib/booking-status";
-import { ActiveBooking } from "@/app/(dashboard)/user/components/ActiveBooking";
+import { ActiveBooking } from "@/app/[locale]/(dashboard)/user/components/ActiveBooking";
 import { AstrologyCrossSell } from "@/components/dashboard/AstrologyCrossSell";
 import { useEffect } from "react";
 
 export function UserBentoDashboard() {
+  const t = useTranslations("Dashboard");
   const profile = useAuthStore((s) => s.profile) as UserResponse | null;
   const setActiveBooking = useBookingStore((s) => s.setActiveBooking);
 
@@ -79,15 +81,15 @@ export function UserBentoDashboard() {
                 <Sparkles className="size-4" /> Namaste, {profile.name.split(" ")[0]}
               </p>
               <h2 className="mt-2 text-2xl font-semibold">
-                Ready for your next ceremony?
+                {t("readyForNext")}
               </h2>
               <p className="mt-1 max-w-sm text-sm text-white/85">
-                Get matched with a verified Purohit in real time.
+                {t("getMatched")}
               </p>
             </div>
             <Button asChild size="lg" variant="secondary" className="w-fit text-foreground">
               <Link href="/user/book">
-                <CalendarPlus className="size-4" /> Book a Puja
+                <CalendarPlus className="size-4" /> {t("bookPuja")}
               </Link>
             </Button>
           </CardContent>
@@ -96,13 +98,13 @@ export function UserBentoDashboard() {
 
       <StatTile
         icon={Clock}
-        label="Upcoming"
+        label={t("upcoming")}
         value={String(upcoming.length)}
         delay={0.05}
       />
       <StatTile
         icon={MapPin}
-        label="Saved addresses"
+        label={t("savedAddresses")}
         value={String((profile.saved_addresses || []).length)}
         delay={0.1}
       />
@@ -117,9 +119,9 @@ export function UserBentoDashboard() {
         <Card className="h-full">
           <CardContent className="py-5">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="font-medium">Recent bookings</h3>
+              <h3 className="font-medium">{t("recentBookings")}</h3>
               <Link href="/user/bookings" className="text-sm text-primary hover:underline">
-                View all
+                {t("viewAll")}
               </Link>
             </div>
 
@@ -129,7 +131,7 @@ export function UserBentoDashboard() {
 
             {historyQuery.data?.length === 0 && (
               <p className="rounded-lg bg-muted/50 p-4 text-sm text-muted-foreground">
-                No bookings yet. Start by booking your first Puja.
+                {t("noBookings")}
               </p>
             )}
 
@@ -142,7 +144,7 @@ export function UserBentoDashboard() {
                   <div className="min-w-0">
                     <p className="truncate font-medium">{booking.puja_category}</p>
                     <p className="text-xs text-muted-foreground">
-                      with {booking.purohit_name}
+                      {t("withName", { name: booking.purohit_name || "Unknown" })}
                     </p>
                   </div>
                   <Badge variant={STATUS_BADGE_VARIANT[booking.status] ?? "secondary"}>
@@ -164,10 +166,10 @@ export function UserBentoDashboard() {
           <CardContent className="flex h-full flex-col justify-center gap-2 py-5 text-center">
             <CheckCircle2 className="mx-auto size-6 text-emerald-500" />
             <p className="text-sm text-muted-foreground">
-              Keep your profile and addresses up to date for faster matching.
+              {t("keepProfileUpToDate")}
             </p>
             <Button variant="outline" size="sm" asChild>
-              <Link href="/user/profile">Manage profile</Link>
+              <Link href="/user/profile">{t("manageProfile")}</Link>
             </Button>
           </CardContent>
         </Card>

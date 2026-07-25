@@ -1,0 +1,60 @@
+{
+  "Dashboard": {
+    "dashboard": "Dashboard",
+    "greeting": "Hello, {name}",
+    "cosmicInsight": "Cosmic Insight",
+    "bookPuja": "Book a Puja",
+    "readyForNext": "Ready for your next ceremony?",
+    "getMatched": "Get matched with a verified Purohit in real time.",
+    "upcoming": "Upcoming",
+    "savedAddresses": "Saved addresses",
+    "recentBookings": "Recent bookings",
+    "viewAll": "View all",
+    "noBookings": "No bookings yet. Start by booking your first Puja.",
+    "keepProfileUpToDate": "Keep your profile and addresses up to date for faster matching.",
+    "manageProfile": "Manage profile",
+    "unlockRecommendations": "Unlock Personalized Puja Recommendations",
+    "addDobPrompt": "Add your Date of Birth to your profile to discover your current Mahadasha and recommended spiritual remedies.",
+    "addBirthDetails": "Add Birth Details",
+    "underInfluenceOf": "You are currently under the strong astrological influence of",
+    "recommendPerforming": "Based on ancient Vedic scriptures, we highly recommend performing a",
+    "toHarmonizeEnergy": "to harmonize this cosmic energy.",
+    "bookSpecificPuja": "Book {pujaName}",
+    "withName": "with {name}"
+  },
+  "Navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "book": "Book",
+    "bookings": "Bookings",
+    "profile": "Profile",
+    "profileSettings": "Profile settings",
+    "signOut": "Sign out"
+  },
+  "Booking": {
+    "bookPujaTitle": "Book a Puja",
+    "bookPujaSubtitle": "Tell us what you need — we'll match you with a nearby Purohit instantly.",
+    "selectCeremony": "Select your ceremony",
+    "chooseRitual": "Choose the ritual you need a Purohit for.",
+    "offeredDakshina": "Offered Dakshina (₹)",
+    "ePujaVirtual": "E-Puja Virtual Ceremony",
+    "ePujaDesc": "Perform Puja remotely with LiveKit High-Fidelity Video & Shankha/Ghanta Audio Mode",
+    "continueBtn": "Continue",
+    "backBtn": "Back",
+    "searchOrType": "Search or type a custom ceremony...",
+    "searchCeremonies": "Search ceremonies...",
+    "suggestions": "Suggestions",
+    "noCeremoniesFound": "No ceremonies found.",
+    "addNewCeremony": "Add \"{name}\" as a new ceremony",
+    "step_puja": "Puja",
+    "step_schedule": "Schedule",
+    "step_location": "Location",
+    "step_matching": "Matching",
+    "step_confirmed": "Confirmed",
+    "step_of": "Step {current} of {total}"
+  },
+  "SEO": {
+    "title": "Purohit Booking System — Book a Verified Priest Instantly",
+    "description": "An Uber-like platform for booking verified Purohits for Puja, Griha Pravesh, weddings and more."
+  }
+}

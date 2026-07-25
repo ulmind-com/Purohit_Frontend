@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname } from "@/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import type { ReactNode } from "react";
 
