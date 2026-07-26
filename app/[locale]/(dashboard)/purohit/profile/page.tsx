@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
@@ -19,22 +19,31 @@ import { ProfileFormSkeleton } from "@/components/shared/loading-skeletons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { LocationMapPicker } from "@/components/map/location-map-picker";
 
+import { MultiZoneMap } from "@/components/purohit/MultiZoneMap";
+import { ZoneControlPanel } from "@/components/purohit/ZoneControlPanel";
 import { SecureCloudinaryUpload } from "@/components/ui/SecureCloudinaryUpload";
 import { ServiceToggles } from "@/components/purohit/ServiceToggles";
 import { LeaveCalendar } from "@/components/purohit/LeaveCalendar";
 
 // Zod schema matching the backend models
+// Service Zone sub-schema
+const serviceZoneSchema = z.object({
+  id: z.string(),
+  lat: z.number(),
+  lng: z.number(),
+  radius_km: z.number().min(1, "Min 1 km").max(500, "Max 500 km"),
+  name: z.string().min(1, "Zone name is required"),
+});
+
 const profileSchema = z.object({
   name: z.string().min(2),
   mobile_number: z.string().min(10).max(15),
   expertise: z.array(z.string()).min(1, "Select at least one"),
   price: z.coerce.number().gt(0),
-  service_radius_km: z.coerce.number().min(1).max(200),
+  service_zones: z.array(serviceZoneSchema).min(1, "Please define at least one service zone."),
   
   // New Fields
   experience_years: z.coerce.number().min(0).default(0),
@@ -65,6 +74,15 @@ export default function PurohitProfilePage() {
     typeof d === "string" ? parseISO(d) : d
   ) || [];
 
+  // Transform backend service_zones (GeoJSON) to form format (flat lat/lng)
+  const defaultZones = (profile?.service_zones || []).map((z: any) => ({
+    id: z.id || crypto.randomUUID(),
+    name: z.name || "Zone",
+    lat: z.location?.coordinates?.[1] ?? 22.5726,
+    lng: z.location?.coordinates?.[0] ?? 88.3639,
+    radius_km: z.radius_km || 10,
+  }));
+
   const methods = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -72,7 +90,7 @@ export default function PurohitProfilePage() {
       mobile_number: profile?.mobile_number || "",
       expertise: profile?.expertise || [],
       price: profile?.price || 1001,
-      service_radius_km: profile?.service_radius_km || 10,
+      service_zones: defaultZones,
       experience_years: profile?.experience_years || 0,
       education_upadhi: profile?.education_upadhi || "",
       temple_affiliation: profile?.temple_affiliation || "",
@@ -100,19 +118,27 @@ export default function PurohitProfilePage() {
   });
 
   function onSubmit(values: ProfileFormValues) {
-    // Convert Dates back to ISO strings if needed, though Axios typically handles it or we can map it
+    // Transform zones from flat lat/lng to backend GeoJSON format
+    const { service_zones, ...rest } = values;
     const dataToSubmit = {
-      ...values,
+      ...rest,
       blocked_dates: values.blocked_dates.map(d => d.toISOString()),
+      service_zones: service_zones.map((z) => ({
+        id: z.id,
+        name: z.name,
+        location: {
+          type: "Point" as const,
+          coordinates: [z.lng, z.lat] as [number, number],
+        },
+        radius_km: z.radius_km,
+      })),
     };
     mutation.mutate(dataToSubmit as any);
   }
 
   if (!profile) return <ProfileFormSkeleton />;
 
-  const radius = methods.watch("service_radius_km");
-  const lng = profile?.location?.coordinates?.[0] || 88.3639;
-  const lat = profile?.location?.coordinates?.[1] || 22.5726;
+
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 pb-12">
@@ -237,54 +263,42 @@ export default function PurohitProfilePage() {
                     )}
                   />
 
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <FormField
-                      control={methods.control}
-                      name="price"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Base Dakshina (₹)</FormLabel>
-                          <FormControl><Input type="number" min={1} {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={methods.control}
-                      name="service_radius_km"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Service Radius: {radius} km</FormLabel>
-                          <FormControl>
-                            <Slider
-                              min={1} max={200} step={1}
-                              value={[field.value]}
-                              onValueChange={([v]) => field.onChange(v)}
-                              className="pt-2.5"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <FormField
+                    control={methods.control}
+                    name="price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Base Dakshina (₹)</FormLabel>
+                        <FormControl><Input type="number" min={1} {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                  <div>
-                    <FormLabel>Base Location</FormLabel>
-                    <p className="mb-2 text-xs text-muted-foreground">
-                      New location is saved with your other changes on submit.
-                    </p>
-                    <LocationMapPicker
-                      mapHeight="240px"
-                      radiusKm={radius}
-                      value={{ lat, lng, formattedAddress: profile?.address_text ?? "" }}
-                      onChange={(loc) =>
-                        mutation.mutate({
-                          location: { type: "Point", coordinates: [loc.lng, loc.lat] },
-                          address_text: loc.formattedAddress,
-                        } as any)
-                      }
-                    />
+                  {/* Multi-Zone Service Areas */}
+                  <div className="space-y-4 pt-4 border-t border-border">
+                    <div>
+                      <FormLabel className="text-base font-semibold">Service Zones</FormLabel>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Click on the map to add zones where you provide services. Adjust each zone&apos;s radius independently.
+                      </p>
+                    </div>
+
+                    <div className="grid gap-4 lg:grid-cols-[1fr_340px]">
+                      <MultiZoneMap />
+                      <ZoneControlPanel />
+                    </div>
+
+                    {methods.formState.errors.service_zones?.root?.message && (
+                      <p className="text-sm text-destructive">
+                        {methods.formState.errors.service_zones.root.message}
+                      </p>
+                    )}
+                    {methods.formState.errors.service_zones?.message && (
+                      <p className="text-sm text-destructive">
+                        {methods.formState.errors.service_zones.message}
+                      </p>
+                    )}
                   </div>
                 </TabsContent>
 

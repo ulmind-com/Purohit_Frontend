@@ -7,8 +7,10 @@ import {
   LayoutGrid,
   LogOut,
   MapPinned,
+  Map,
   Settings,
   Search,
+  BookOpen,
   User as UserIcon,
 } from "lucide-react";
 
@@ -34,12 +36,14 @@ const NAV_LINKS: Record<Role, { href: string; label: any; icon: typeof LayoutGri
   user: [
     { href: "/user", label: "home", icon: LayoutGrid },
     { href: "/search", label: "search", icon: Search },
+    { href: "/gita", label: "gita", icon: BookOpen },
     { href: "/user/book", label: "book", icon: CalendarClock },
     { href: "/user/bookings", label: "bookings", icon: MapPinned },
     { href: "/user/profile", label: "profile", icon: UserIcon },
   ],
   purohit: [
     { href: "/purohit", label: "home", icon: LayoutGrid },
+    { href: "/purohit/zones", label: "zones", icon: Map },
     { href: "/purohit/bookings", label: "bookings", icon: MapPinned },
     { href: "/purohit/profile", label: "profile", icon: Settings },
   ],
