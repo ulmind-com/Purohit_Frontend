@@ -114,7 +114,6 @@ export function DirectBookModal({ isOpen, onClose, purohitId, purohitName }: Dir
                   selected={date}
                   onSelect={setDate}
                   disabled={(d) => d < new Date(new Date().setHours(0,0,0,0))}
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>

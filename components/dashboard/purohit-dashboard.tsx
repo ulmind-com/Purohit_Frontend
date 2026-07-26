@@ -44,9 +44,9 @@ export function PurohitDashboard() {
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
 
   const isOnline = profile?.is_online ?? false;
-  const lat = profile?.location.coordinates[1] ?? 0;
-  const lng = profile?.location.coordinates[0] ?? 0;
-  const radiusKm = profile?.service_radius_km ?? 10;
+  const lat = profile?.service_zones?.[0]?.location?.coordinates?.[1] ?? 0;
+  const lng = profile?.service_zones?.[0]?.location?.coordinates?.[0] ?? 0;
+  const radiusKm = profile?.service_zones?.[0]?.radius_km ?? 10;
 
   // Removed availabilityMutation as it's now inside OnlineToggle
   const nearbyQuery = useQuery({

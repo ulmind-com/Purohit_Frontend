@@ -56,8 +56,8 @@ export function RapidoSearchingMap({
   const purohitMarkers = realPurohits.map((p) => ({
     id: p._id,
     name: p.name,
-    lat: p.location.coordinates[1],
-    lng: p.location.coordinates[0],
+    lat: p.service_zones?.[0]?.location?.coordinates?.[1] ?? 0,
+    lng: p.service_zones?.[0]?.location?.coordinates?.[0] ?? 0,
     distance: `${(p.distance_in_km ?? 1).toFixed(1)} km`,
   }));
 

@@ -111,9 +111,8 @@ export interface PurohitResponse {
   expertise: Expertise[];
   languages?: SupportedLanguage[];
   tradition?: PujaTradition;
-  location: GeoJSONPoint;
+  service_zones: any[];
   address_text: string | null;
-  service_radius_km: number;
   rating: number;
   price: number;
   is_available: boolean;
@@ -128,9 +127,8 @@ export interface PurohitUpdatePayload {
   expertise?: Expertise[];
   languages?: SupportedLanguage[];
   tradition?: PujaTradition;
-  location?: GeoJSONPoint;
+  service_zones?: any[];
   address_text?: string;
-  service_radius_km?: number;
   price?: number;
   is_available?: boolean;
   is_online?: boolean;
