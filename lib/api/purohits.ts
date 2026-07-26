@@ -32,9 +32,7 @@ export interface UpdatePurohitProfilePayload {
   name?: string;
   mobile_number?: string;
   expertise?: string[];
-  location?: GeoJSONPoint;
   address_text?: string;
-  service_radius_km?: number;
   price?: number;
   is_available?: boolean;
   is_online?: boolean;
@@ -54,12 +52,6 @@ export async function setAvailability(is_available: boolean) {
 
 export async function setOnlineStatus(is_online: boolean) {
   return updateMyPurohitProfile({ is_online });
-}
-
-export async function updateLocation(lat: number, lng: number) {
-  return updateMyPurohitProfile({ 
-    location: { type: "Point", coordinates: [lng, lat] } 
-  });
 }
 
 /**
