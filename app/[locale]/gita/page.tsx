@@ -92,7 +92,8 @@ export default async function GitaChaptersPage() {
             <FlipBookViewer 
               books={[
                 { label: "Bengali PDF", value: "bn", url: "/Bhagavad-gita Bengali.pdf" },
-                { label: "English PDF", value: "en", url: "/Bhagavad-gita-English.pdf" }
+                { label: "English PDF", value: "en", url: "/Bhagavad-gita-English.pdf" },
+                { label: "Hindi PDF", value: "hi", url: "/Bhagavad-gita-Hindi.pdf" }
               ]} 
               defaultBook="bn"
             />
