@@ -198,8 +198,12 @@ export function LiveTrackingPanel({
 
   const initialLocation = useMemo(() => {
     if (!purohitProfile) return null;
-    const [lng, lat] = purohitProfile.location.coordinates;
-    return { lat, lng };
+    if (purohitProfile.service_zones && purohitProfile.service_zones.length > 0) {
+      const zone = purohitProfile.service_zones[0];
+      const [lng, lat] = zone.location?.coordinates || [0, 0];
+      if (lat && lng) return { lat, lng };
+    }
+    return null;
   }, [purohitProfile]);
 
   const activePurohitLocation = livePurohitLocation || initialLocation;

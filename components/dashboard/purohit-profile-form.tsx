@@ -52,7 +52,7 @@ export function PurohitProfileForm({ profile }: { profile: PurohitResponse }) {
       mobile_number: profile.mobile_number,
       expertise: profile.expertise,
       price: profile.price,
-      service_radius_km: profile.service_radius_km,
+      service_radius_km: (profile as any).service_radius_km || 10,
     },
   });
 
@@ -71,7 +71,8 @@ export function PurohitProfileForm({ profile }: { profile: PurohitResponse }) {
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const radius = form.watch("service_radius_km");
-  const [lng, lat] = profile.location.coordinates;
+  const profileAny = profile as any;
+  const [lng, lat] = profileAny.location?.coordinates || [0, 0];
 
   function onSubmit(values: FormValues) {
     mutation.mutate(values);
@@ -203,7 +204,14 @@ export function PurohitProfileForm({ profile }: { profile: PurohitResponse }) {
                 value={{ lat, lng, formattedAddress: profile.address_text ?? "" }}
                 onChange={(loc) =>
                   mutation.mutate({
-                    location: { type: "Point", coordinates: [loc.lng, loc.lat] },
+                    service_zones: [
+                      {
+                        id: crypto.randomUUID(),
+                        name: "Default Zone",
+                        location: { type: "Point", coordinates: [loc.lng, loc.lat] },
+                        radius_km: radius || 10,
+                      }
+                    ],
                     address_text: loc.formattedAddress,
                   })
                 }

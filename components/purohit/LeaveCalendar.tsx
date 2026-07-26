@@ -43,7 +43,7 @@ export function LeaveCalendar() {
                   disabled={(date) => isBefore(date, startOfDay(new Date()))}
                   className="rounded-md border bg-background"
                   classNames={{
-                    day_selected:
+                    selected:
                       "bg-destructive text-destructive-foreground hover:bg-destructive hover:text-destructive-foreground focus:bg-destructive focus:text-destructive-foreground",
                   }}
                 />

@@ -112,7 +112,7 @@ export function PurohitProfileForm({ initialData, onSuccess }: PurohitProfileFor
       name: initialData?.name || "",
       mobile_number: initialData?.mobile_number || "",
       price: initialData?.price || 1500,
-      service_radius_km: initialData?.service_radius_km || 15,
+      service_radius_km: (initialData as any)?.service_radius_km || 15,
       expertise: (initialData?.expertise as Expertise[]) || ["Puja"],
       languages: (initialData?.languages as SupportedLanguage[]) || ["Bengali"],
       tradition: (initialData?.tradition as PujaTradition) || "Bengali",

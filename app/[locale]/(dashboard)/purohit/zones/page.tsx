@@ -21,7 +21,7 @@ export default function ZonesPage() {
   const methods = useForm<ZoneFormValues>({
     resolver: zodResolver(zoneSchema),
     defaultValues: {
-      service_zones: (profile as Record<string, unknown>)?.service_zones as ZoneFormValues["service_zones"] ?? [],
+      service_zones: ((profile as any)?.service_zones as ZoneFormValues["service_zones"]) ?? [],
     },
   });
 

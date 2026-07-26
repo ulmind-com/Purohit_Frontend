@@ -36,6 +36,7 @@ export interface UpdatePurohitProfilePayload {
   price?: number;
   is_available?: boolean;
   is_online?: boolean;
+  service_zones?: any[];
 }
 
 /** Requires the `PATCH /purohits/me` addition documented in the project README. */

@@ -70,12 +70,12 @@ export default function PurohitProfilePage() {
   const [activeTab, setActiveTab] = useState("basic");
 
   // Handle parsing string dates to Date objects for the form
-  const defaultBlockedDates = profile?.blocked_dates?.map((d: string | Date) => 
+  const defaultBlockedDates = (profile as any)?.blocked_dates?.map((d: string | Date) => 
     typeof d === "string" ? parseISO(d) : d
   ) || [];
 
   // Transform backend service_zones (GeoJSON) to form format (flat lat/lng)
-  const defaultZones = (profile?.service_zones || []).map((z: any) => ({
+  const defaultZones = ((profile as any)?.service_zones || []).map((z: any) => ({
     id: z.id || crypto.randomUUID(),
     name: z.name || "Zone",
     lat: z.location?.coordinates?.[1] ?? 22.5726,
@@ -84,7 +84,7 @@ export default function PurohitProfilePage() {
   }));
 
   const methods = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(profileSchema) as any,
     defaultValues: {
       name: profile?.name || "",
       mobile_number: profile?.mobile_number || "",
