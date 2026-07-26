@@ -89,7 +89,13 @@ export default async function GitaChaptersPage() {
 
           {/* Full E-Book Flipbook Section */}
           <TabsContent value="ebook" className="mt-0 outline-none w-full h-[80vh] min-h-[600px]">
-            <FlipBookViewer pdfUrl="/Bhagavad-gita Bengali.pdf" />
+            <FlipBookViewer 
+              books={[
+                { label: "Bengali PDF", value: "bn", url: "/Bhagavad-gita Bengali.pdf" },
+                { label: "English PDF", value: "en", url: "/Bhagavad-gita-English.pdf" }
+              ]} 
+              defaultBook="bn"
+            />
           </TabsContent>
         </Tabs>
       </div>

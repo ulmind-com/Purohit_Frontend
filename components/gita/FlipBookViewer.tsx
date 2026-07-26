@@ -11,8 +11,17 @@ import "react-pdf/dist/Page/TextLayer.css";
 // Configure PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+export interface BookOption {
+  label: string;
+  value: string;
+  url: string;
+}
+
 interface FlipBookViewerProps {
-  pdfUrl: string;
+  books: BookOption[];
+  defaultBook?: string;
 }
 
 interface PdfPageProps {
@@ -51,7 +60,10 @@ const PdfPage = forwardRef<HTMLDivElement, PdfPageProps>(({ pageNumber, isActive
 });
 PdfPage.displayName = "PdfPage";
 
-export function FlipBookViewer({ pdfUrl }: FlipBookViewerProps) {
+export function FlipBookViewer({ books, defaultBook }: FlipBookViewerProps) {
+  const [activeBook, setActiveBook] = useState<string>(defaultBook || books[0].value);
+  const activePdfUrl = books.find(b => b.value === activeBook)?.url || books[0].url;
+
   const [numPages, setNumPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [scale, setScale] = useState<number>(1.0);
@@ -67,6 +79,14 @@ export function FlipBookViewer({ pdfUrl }: FlipBookViewerProps) {
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
+    setCurrentPage(0);
+  };
+
+  const handleBookChange = (value: string) => {
+    setActiveBook(value);
+    setNumPages(0);
+    setCurrentPage(0);
+    setScale(1.0);
   };
 
   const onFlip = (e: any) => {
@@ -96,10 +116,25 @@ export function FlipBookViewer({ pdfUrl }: FlipBookViewerProps) {
     <div className="flex flex-col items-center w-full h-full bg-[#fdf6e3]/50 dark:bg-[#0f172a]/50 rounded-2xl border border-amber-900/10 overflow-hidden relative">
       
       {/* Top Controls */}
-      <div className="w-full flex items-center justify-between p-4 bg-white/80 dark:bg-black/40 backdrop-blur-md border-b border-amber-900/10 z-10">
-        <div className="flex items-center gap-2">
-          <BookOpen className="size-5 text-amber-600" />
-          <span className="font-serif font-medium text-amber-950 dark:text-amber-100 hidden sm:inline">Bhagavad Gita (Bengali)</span>
+      <div className="w-full flex items-center justify-between p-4 bg-white/80 dark:bg-black/40 backdrop-blur-md border-b border-amber-900/10 z-10 flex-wrap gap-4">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 text-amber-600">
+            <BookOpen className="size-5" />
+            <span className="font-serif font-medium text-amber-950 dark:text-amber-100 hidden sm:inline">Bhagavad Gita</span>
+          </div>
+          
+          <Select value={activeBook} onValueChange={handleBookChange}>
+            <SelectTrigger className="w-[180px] h-9 text-sm">
+              <SelectValue placeholder="Select Language" />
+            </SelectTrigger>
+            <SelectContent>
+              {books.map((book) => (
+                <SelectItem key={book.value} value={book.value}>
+                  {book.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         
         <div className="flex items-center gap-2">
@@ -116,7 +151,8 @@ export function FlipBookViewer({ pdfUrl }: FlipBookViewerProps) {
       {/* Book Container */}
       <div className="flex-1 w-full flex items-center justify-center p-4 sm:p-8 overflow-hidden">
         <Document
-          file={pdfUrl}
+          key={activeBook}
+          file={activePdfUrl}
           onLoadSuccess={onDocumentLoadSuccess}
           loading={
             <div className="flex flex-col items-center justify-center text-amber-600">
