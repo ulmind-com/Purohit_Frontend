@@ -20,6 +20,7 @@ export interface BookOption {
 }
 
 interface FlipBookViewerProps {
+  title: string;
   books: BookOption[];
   defaultBook?: string;
 }
@@ -60,7 +61,7 @@ const PdfPage = forwardRef<HTMLDivElement, PdfPageProps>(({ pageNumber, isActive
 });
 PdfPage.displayName = "PdfPage";
 
-export function FlipBookViewer({ books, defaultBook }: FlipBookViewerProps) {
+export function FlipBookViewer({ title, books, defaultBook }: FlipBookViewerProps) {
   const [activeBook, setActiveBook] = useState<string>(defaultBook || books[0].value);
   const activePdfUrl = books.find(b => b.value === activeBook)?.url || books[0].url;
 
@@ -120,7 +121,7 @@ export function FlipBookViewer({ books, defaultBook }: FlipBookViewerProps) {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-amber-600">
             <BookOpen className="size-5" />
-            <span className="font-serif font-medium text-amber-950 dark:text-amber-100 hidden sm:inline">Bhagavad Gita</span>
+            <span className="font-serif font-medium text-amber-950 dark:text-amber-100 hidden sm:inline">{title}</span>
           </div>
           
           <Select value={activeBook} onValueChange={handleBookChange}>
