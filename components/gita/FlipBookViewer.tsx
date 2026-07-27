@@ -6,6 +6,7 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { Loader2, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { motion, AnimatePresence } from "framer-motion";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
@@ -114,23 +115,33 @@ export function FlipBookViewer({ title, books, defaultBook, audioUrl }: FlipBook
   const bookHeight = isMobile ? 480 : 650;
 
   return (
-    <div className="flex flex-col items-center w-full h-full bg-[#fdf6e3]/50 dark:bg-[#0f172a]/50 rounded-2xl border border-amber-900/10 overflow-hidden relative">
+    <motion.div 
+      initial={{ opacity: 0, y: 40, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className="flex flex-col items-center w-full h-full bg-white/5 dark:bg-black/20 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 overflow-hidden relative shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+    >
       
       {/* Top Controls */}
-      <div className="w-full flex items-center justify-between p-4 bg-white/80 dark:bg-black/40 backdrop-blur-md border-b border-amber-900/10 z-10 flex-wrap gap-4">
+      <motion.div 
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
+        className="w-full flex items-center justify-between p-4 bg-black/20 backdrop-blur-md border-b border-white/5 z-10 flex-wrap gap-4 rounded-t-[2.5rem]"
+      >
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-amber-600">
+          <div className="flex items-center gap-2 text-amber-500 bg-amber-500/10 px-4 py-2 rounded-full border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
             <BookOpen className="size-5" />
-            <span className="font-serif font-medium text-amber-950 dark:text-amber-100 hidden sm:inline">{title}</span>
+            <span className="font-serif font-medium text-amber-100 hidden sm:inline">{title}</span>
           </div>
           
           <Select value={activeBook} onValueChange={handleBookChange}>
-            <SelectTrigger className="w-[180px] h-9 border-amber-500/30 bg-white/50 dark:bg-black/40 text-amber-900 dark:text-amber-100">
+            <SelectTrigger className="w-[180px] h-10 rounded-full border-white/10 bg-black/40 text-amber-100 hover:bg-black/60 transition-colors">
               <SelectValue placeholder="Select Language" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-slate-900/90 backdrop-blur-xl border-white/10 text-amber-100 rounded-2xl">
               {books.map((book) => (
-                <SelectItem key={book.value} value={book.value}>
+                <SelectItem key={book.value} value={book.value} className="focus:bg-amber-500/20 focus:text-amber-300 cursor-pointer">
                   {book.label}
                 </SelectItem>
               ))}
@@ -139,41 +150,52 @@ export function FlipBookViewer({ title, books, defaultBook, audioUrl }: FlipBook
         </div>
 
         {audioUrl && (
-            <div className="hidden md:block">
-              <audio controls controlsList="nodownload" className="h-9 w-64 max-w-full">
+            <div className="hidden md:flex items-center gap-3 bg-black/40 rounded-full pr-2 pl-4 border border-white/10 shadow-inner">
+              <BookOpen className="size-4 text-amber-500/80 animate-pulse" />
+              <audio controls controlsList="nodownload" className="h-10 w-64 max-w-full opacity-80 hover:opacity-100 transition-opacity [&::-webkit-media-controls-panel]:bg-transparent [&::-webkit-media-controls-current-time-display]:text-amber-100 [&::-webkit-media-controls-time-remaining-display]:text-amber-100 [&::-webkit-media-controls-play-button]:invert">
                 <source src={audioUrl} type="audio/mpeg" />
                 Your browser does not support the audio element.
               </audio>
             </div>
           )}
 
-          <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={zoomOut} className="size-8 rounded-full">
+        <div className="flex items-center gap-1 bg-black/40 rounded-full p-1 border border-white/10">
+          <Button variant="ghost" size="icon" onClick={zoomOut} className="size-8 rounded-full text-amber-100 hover:bg-white/10 hover:text-white">
             <ZoomOut className="size-4" />
           </Button>
-          <span className="text-xs font-medium w-12 text-center text-muted-foreground">{Math.round(scale * 100)}%</span>
-          <Button variant="outline" size="icon" onClick={zoomIn} className="size-8 rounded-full">
+          <span className="text-xs font-medium w-12 text-center text-amber-100/70">{Math.round(scale * 100)}%</span>
+          <Button variant="ghost" size="icon" onClick={zoomIn} className="size-8 rounded-full text-amber-100 hover:bg-white/10 hover:text-white">
             <ZoomIn className="size-4" />
           </Button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Book Container */}
-      <div className="flex-1 w-full flex items-center justify-center p-4 sm:p-8 overflow-hidden">
+      <div className="flex-1 w-full flex items-center justify-center p-4 sm:p-8 overflow-hidden relative">
         <Document
           key={activeBook}
           file={activePdfUrl}
           onLoadSuccess={onDocumentLoadSuccess}
           loading={
-            <div className="flex flex-col items-center justify-center text-amber-600">
-              <Loader2 className="size-10 animate-spin mb-4" />
-              <p className="font-serif animate-pulse">Loading Divine Wisdom...</p>
-            </div>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center justify-center text-amber-500 bg-black/40 backdrop-blur-xl p-8 rounded-3xl border border-white/10 shadow-2xl"
+            >
+              <Loader2 className="size-12 animate-spin mb-6" />
+              <p className="font-serif text-xl tracking-widest uppercase text-amber-200/80 animate-pulse">Summoning Sacred Texts...</p>
+            </motion.div>
           }
           className="flex items-center justify-center"
         >
           {numPages > 0 && (
-            <div className="shadow-2xl ring-1 ring-black/5 transition-transform duration-300 ease-in-out" style={{ transform: `scale(${scale})`, transformOrigin: "top center" }}>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="shadow-[0_20px_60px_rgba(0,0,0,0.6)] ring-1 ring-white/10 rounded-lg transition-transform duration-300 ease-in-out" 
+              style={{ transform: `scale(${scale})`, transformOrigin: "center center" }}
+            >
               <HTMLFlipBook
                 width={bookWidth}
                 height={bookHeight}
@@ -202,8 +224,6 @@ export function FlipBookViewer({ title, books, defaultBook, audioUrl }: FlipBook
                 disableFlipByClick={false}
               >
                 {Array.from(new Array(numPages), (el, index) => {
-                  // Only fully render pages within a +/- 4 page window of the current page to save memory
-                  // We must render DOM nodes for all pages so HTMLFlipBook knows the total page count
                   const isActive = Math.abs(currentPage - index) <= 4;
                   return (
                     <PdfPage
@@ -215,37 +235,45 @@ export function FlipBookViewer({ title, books, defaultBook, audioUrl }: FlipBook
                   );
                 })}
               </HTMLFlipBook>
-            </div>
+            </motion.div>
           )}
         </Document>
       </div>
 
       {/* Bottom Navigation */}
+      <AnimatePresence>
       {numPages > 0 && (
-        <div className="w-full flex items-center justify-between p-4 bg-white/80 dark:bg-black/40 backdrop-blur-md border-t border-amber-900/10 z-10">
+        <motion.div 
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 50, opacity: 0 }}
+          transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
+          className="w-full flex items-center justify-between p-4 bg-black/20 backdrop-blur-md border-t border-white/5 z-10 rounded-b-[2.5rem]"
+        >
           <Button 
-            variant="outline" 
+            variant="ghost" 
             onClick={prevButtonClick}
             disabled={currentPage === 0}
-            className="rounded-full shadow-sm hover:bg-amber-50"
+            className="rounded-full shadow-sm hover:bg-white/10 text-amber-100 hover:text-white border border-transparent hover:border-white/10 px-6 transition-all"
           >
-            <ChevronLeft className="size-4 mr-1" /> Prev Page
+            <ChevronLeft className="size-4 mr-2" /> Prev Page
           </Button>
           
-          <div className="text-sm font-serif text-slate-600 dark:text-slate-400 font-medium bg-amber-100/50 dark:bg-amber-900/20 px-4 py-1.5 rounded-full">
+          <div className="text-sm font-serif text-amber-200/80 font-medium bg-black/40 border border-white/10 shadow-inner px-6 py-2 rounded-full tracking-wider">
             Page {currentPage + 1} of {numPages}
           </div>
 
           <Button 
-            variant="outline" 
+            variant="ghost" 
             onClick={nextButtonClick}
             disabled={currentPage >= numPages - 1}
-            className="rounded-full shadow-sm hover:bg-amber-50"
+            className="rounded-full shadow-sm hover:bg-white/10 text-amber-100 hover:text-white border border-transparent hover:border-white/10 px-6 transition-all"
           >
-            Next Page <ChevronRight className="size-4 ml-1" />
+            Next Page <ChevronRight className="size-4 ml-2" />
           </Button>
-        </div>
+        </motion.div>
       )}
-    </div>
+      </AnimatePresence>
+    </motion.div>
   );
 }

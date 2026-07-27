@@ -75,7 +75,7 @@ export function PurohitCard({ purohit }: PurohitCardProps) {
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 shadow-xl backdrop-blur-lg transition-all hover:border-orange-500/50 hover:shadow-orange-500/10 sm:flex-row"
+        className="group relative flex flex-col justify-between overflow-hidden trip-sheet p-5 transition-all hover:border-saffron-500/50 hover:shadow-saffron-500/10 sm:flex-row"
       >
         <div className="flex flex-col gap-4 sm:flex-row">
           {/* Profile Picture & Audio */}
@@ -90,7 +90,7 @@ export function PurohitCard({ purohit }: PurohitCardProps) {
               <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
                 <button 
                   onClick={toggleAudio}
-                  className={`flex size-10 items-center justify-center rounded-full bg-orange-500 text-white shadow-lg transition-transform hover:scale-110 ${isPlaying ? "animate-pulse" : ""}`}
+                  className={`flex size-10 items-center justify-center rounded-full bg-saffron-500 text-white shadow-lg transition-transform hover:scale-110 ${isPlaying ? "animate-pulse" : ""}`}
                 >
                   {isPlaying ? <Pause className="size-5" /> : <Play className="size-5 ml-1" />}
                 </button>
@@ -104,7 +104,7 @@ export function PurohitCard({ purohit }: PurohitCardProps) {
             )}
             {/* If audio is playing, show a glowing ring */}
             {isPlaying && (
-              <div className="absolute inset-0 rounded-full border-2 border-orange-500 animate-ping opacity-50" />
+              <div className="absolute inset-0 rounded-full border-2 border-saffron-500 animate-ping opacity-50" />
             )}
           </div>
 
@@ -130,7 +130,7 @@ export function PurohitCard({ purohit }: PurohitCardProps) {
             </div>
 
             <div className="flex flex-wrap gap-2 pt-1">
-              <Badge variant="secondary" className="bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20">
+              <Badge variant="secondary" className="bg-saffron-500/10 text-saffron-600 dark:text-saffron-400 border-saffron-500/20">
                 {purohit.tradition}
               </Badge>
               {purohit.languages.map(lang => (
@@ -149,7 +149,7 @@ export function PurohitCard({ purohit }: PurohitCardProps) {
             <p className="text-2xl font-bold text-foreground">₹{purohit.price}</p>
           </div>
           <Button 
-            className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white sm:w-auto"
+            className="w-full bg-gradient-to-r from-saffron-500 to-marigold-500 hover:from-saffron-600 hover:to-marigold-600 text-white sm:w-auto"
             onClick={() => setIsModalOpen(true)}
           >
             Direct Book
