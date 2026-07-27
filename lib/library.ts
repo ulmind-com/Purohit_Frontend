@@ -78,5 +78,15 @@ export const SPIRITUAL_LIBRARY: LibraryBook[] = [
     versions: [
       { label: "Bengali (বাংলা)", value: "bn", url: "/Lokkhi-Brotokotha-Bengali.pdf" }
     ]
+  },
+  {
+    id: "purohit-darpan",
+    title: "Purohit Darpan",
+    description: "The ultimate Bengali reference manual for Hindu priests (Purohits) detailing the meticulous rules, mantras, and procedures for conducting various Pujas and Sanskaras.",
+    coverImage: "/images/purohit-darpan-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/Purohit-Darpan-Bengali.pdf" }
+    ]
   }
 ];
