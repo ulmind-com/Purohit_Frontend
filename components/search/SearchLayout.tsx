@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, SlidersHorizontal } from "lucide-react";
+import { Loader2, SlidersHorizontal, MapPin } from "lucide-react";
 import { api } from "@/lib/api/axios";
+import { useAuthStore } from "@/store/useAuthStore";
+import type { UserResponse } from "@/types";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,8 +47,31 @@ export function SearchLayout() {
   );
 
   // Default coordinates (User's location, ideally fetched from browser/store)
-  const lat = 22.5726;
-  const lng = 88.3639;
+  const profile = useAuthStore((s) => s.profile) as UserResponse | null;
+  const savedLat = profile?.saved_addresses?.[0]?.location?.coordinates?.[1];
+  const savedLng = profile?.saved_addresses?.[0]?.location?.coordinates?.[0];
+  
+  const [lat, setLat] = useState(savedLat ?? 22.5726);
+  const [lng, setLng] = useState(savedLng ?? 88.3639);
+  const [locationName, setLocationName] = useState(profile?.saved_addresses?.[0]?.city || "Kolkata, WB");
+
+  useEffect(() => {
+    // If no saved address, try getting browser geolocation
+    if (!savedLat || !savedLng) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setLat(position.coords.latitude);
+            setLng(position.coords.longitude);
+            setLocationName("Current Location");
+          },
+          (error) => {
+            console.error("Error getting location:", error);
+          }
+        );
+      }
+    }
+  }, [savedLat, savedLng]);
 
   // React Query Fetcher
   const { data, isLoading, isError } = useQuery({
@@ -165,8 +190,13 @@ export function SearchLayout() {
 
       {/* Main Content Area */}
       <main className="flex-1 space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Discover Purohits</h1>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Discover Purohits</h1>
+            <p className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+              <MapPin className="size-4" /> Near {locationName}
+            </p>
+          </div>
           <p className="text-muted-foreground">{data?.total || 0} found near you</p>
         </div>
 

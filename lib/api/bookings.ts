@@ -42,6 +42,16 @@ export async function updateBookingStatus(
   return data;
 }
 
+export async function cancelSearch(bookingId: string) {
+  const { data } = await api.post<BookingResponse>(`/bookings/${bookingId}/cancel-search`);
+  return data;
+}
+
+export async function cancelBookingPurohit(bookingId: string) {
+  const { data } = await api.post<BookingResponse>(`/bookings/${bookingId}/purohit-cancel`);
+  return data;
+}
+
 // --- Uber-like broadcast flow ---
 
 export interface UberBookingRequestPayload {

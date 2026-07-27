@@ -12,6 +12,17 @@ import { useBookingStore } from '@/store/useBookingStore';
 import { api } from '@/lib/api/axios';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { LiveTrackingPanel } from '@/components/booking/live-tracking-panel';
 
@@ -29,6 +40,7 @@ export function ActiveBooking() {
   const [otp, setOtp] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isInitiating, setIsInitiating] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
   const controls = useAnimation();
 
   const channelName = user?._id ? `purohit_${user._id}` : null;
@@ -57,6 +69,22 @@ export function ActiveBooking() {
       toast.error(message);
     } finally {
       setIsInitiating(false);
+    }
+  };
+
+  const handleCancelBooking = async () => {
+    if (!activeBooking) return;
+    
+    try {
+      setIsCancelling(true);
+      await api.post(`/bookings/${activeBooking._id}/purohit-cancel`);
+      toast.success("Booking cancelled successfully.");
+      resetBookingState();
+    } catch (err: any) {
+      const message = err.response?.data?.detail || err.message || "Failed to cancel booking";
+      toast.error(message);
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -209,6 +237,41 @@ export function ActiveBooking() {
               "End Puja"
             )}
           </Button>
+
+          {/* Cancel Booking Button */}
+          {(currentStatus === 'ACCEPTED' || currentStatus === 'CONFIRMED') && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" className="w-full text-destructive border-destructive/20 hover:bg-destructive/10">
+                  Cancel Booking
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    You can only cancel a booking if it is more than 24 hours away.
+                    Cancelling inside this window will result in a penalty. 
+                    This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Go Back</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleCancelBooking();
+                    }}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    disabled={isCancelling}
+                  >
+                    {isCancelling ? <Loader2 className="size-4 mr-2 animate-spin" /> : null}
+                    Yes, Cancel Booking
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </CardContent>
       </Card>
 

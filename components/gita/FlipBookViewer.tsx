@@ -5,13 +5,12 @@ import HTMLFlipBook from "react-pageflip";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Loader2, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
 // Configure PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export interface BookOption {
   label: string;
@@ -175,7 +174,6 @@ export function FlipBookViewer({ title, books, defaultBook, audioUrl }: FlipBook
         >
           {numPages > 0 && (
             <div className="shadow-2xl ring-1 ring-black/5 transition-transform duration-300 ease-in-out" style={{ transform: `scale(${scale})`, transformOrigin: "top center" }}>
-              {/* @ts-ignore */}
               <HTMLFlipBook
                 width={bookWidth}
                 height={bookHeight}
