@@ -1,6 +1,7 @@
 import { Link } from "@/navigation";
 import { SPIRITUAL_LIBRARY } from "@/lib/library";
 import { BookOpen, BookText } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 export default function SpiritualLibraryPage() {
@@ -24,32 +25,49 @@ export default function SpiritualLibraryPage() {
             <Link 
               key={book.id} 
               href={`/library/${book.id}`}
-              className="group relative flex flex-col overflow-hidden rounded-2xl border border-amber-900/10 bg-white/60 p-6 shadow-sm backdrop-blur-md transition-all hover:-translate-y-1 hover:border-amber-500/50 hover:shadow-xl hover:shadow-amber-500/10 dark:border-white/10 dark:bg-black/20"
+              className="group relative flex flex-col overflow-hidden rounded-3xl border border-amber-900/5 dark:border-white/5 bg-white/10 dark:bg-black/10 shadow-lg backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-500/20"
             >
-              <div className="mb-6 flex justify-center">
-                <div className="relative h-48 w-32 shrink-0 overflow-hidden rounded-md shadow-md ring-1 ring-black/10 transition-transform duration-300 group-hover:scale-105">
-                  <div className="absolute inset-0 bg-amber-900/10 flex items-center justify-center">
-                    <BookText className="size-12 text-amber-800/40" />
+              {/* Image Section */}
+              <div className="relative w-full aspect-[4/5] overflow-hidden bg-slate-100 dark:bg-slate-900">
+                  {book.coverImage ? (
+                    <Image
+                      src={book.coverImage}
+                      alt={book.id}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <BookText className="size-12 text-amber-800/40" />
+                    </div>
+                  )}
+                  {/* Subtle inner shadow / overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+                  
+                  {/* Floating pill for languages inside the image */}
+                  <div className="absolute top-4 right-4 z-10">
+                    <div className="text-[10px] uppercase tracking-wider font-semibold px-3 py-1 bg-black/40 text-white backdrop-blur-md rounded-full border border-white/20">
+                      {t("languages", { count: book.versions.length })}
+                    </div>
                   </div>
-                </div>
               </div>
               
-              <div className="flex flex-col flex-1 text-center">
-                <h3 className="text-2xl font-serif font-bold text-slate-800 dark:text-slate-200">
+              {/* Content Section */}
+              <div className="flex flex-col flex-1 p-6 text-left relative z-10 bg-white dark:bg-slate-900 transition-colors duration-500">
+                <h3 className="text-xl font-serif font-bold text-slate-800 dark:text-slate-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                   {tBooks(`${book.id}.title`)}
                 </h3>
-                <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 line-clamp-3">
+                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
                   {tBooks(`${book.id}.description`)}
                 </p>
-              </div>
-
-              <div className="mt-6 flex items-center justify-between border-t border-amber-900/10 dark:border-white/10 pt-4 text-sm font-medium text-amber-700 dark:text-amber-500">
-                <div className="flex items-center gap-1.5">
-                  <BookOpen className="size-4" />
-                  <span>{t("readBook")}</span>
-                </div>
-                <div className="text-xs px-2 py-1 bg-amber-100 dark:bg-amber-900/30 rounded-full">
-                  {t("languages", { count: book.versions.length })}
+                
+                {/* Footer Action */}
+                <div className="mt-6 flex items-center justify-between pt-2">
+                  <div className="flex items-center gap-2 font-medium text-amber-600 dark:text-amber-500 opacity-90 group-hover:opacity-100 transition-all group-hover:translate-x-1">
+                    <BookOpen className="size-4" />
+                    <span className="text-sm">{t("readBook")}</span>
+                  </div>
                 </div>
               </div>
             </Link>

@@ -98,7 +98,7 @@ export function SearchLayout() {
       
       {/* Sidebar Filters */}
       <aside className="w-full shrink-0 space-y-6 md:w-64">
-        <div className="sticky top-20 rounded-xl border border-border bg-card p-5 shadow-sm">
+        <div className="sticky top-20 rounded-3xl border border-white/50 dark:border-white/12 glass p-5 shadow-xl">
           <div className="flex items-center gap-2 pb-4 border-b mb-4">
             <SlidersHorizontal className="size-5" />
             <h2 className="font-semibold">Filters</h2>
