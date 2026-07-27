@@ -58,5 +58,15 @@ export const SPIRITUAL_LIBRARY: LibraryBook[] = [
       { label: "Bengali (বাংলা)", value: "bn", url: "/vishnu-sahasranama-bengali.pdf" },
       { label: "Hindi (हिन्दी)", value: "hi", url: "/vishnu-sahasranama-hindi.pdf" },
     ]
+  },
+  {
+    id: "satyanarayan-panchali",
+    title: "Sri Sri Satyanarayaner Panchali",
+    description: "The sacred Bengali verses recounting the divine narrative and rituals of Lord Satyanarayan, traditionally read during household Pujas.",
+    coverImage: "/images/satyanarayan-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/srisri-satyanarayaner-panchali-bengali.pdf" }
+    ]
   }
 ];
