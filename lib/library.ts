@@ -36,5 +36,16 @@ export const SPIRITUAL_LIBRARY: LibraryBook[] = [
       { label: "Bengali (বাংলা)", value: "bn", url: "/HANUMAN-CHALISA-BENGALI.pdf" },
       { label: "Hindi (हिन्दी)", value: "hi", url: "/Sri_Hanuman_Chalisa_Hindi.pdf" },
     ]
+  },
+  {
+    id: "durga-saptashati",
+    title: "Durga Saptashati (Devi Mahatmyam)",
+    description: "A profound Hindu philosophical text describing the victory of Goddess Durga over the demon Mahishasura, symbolizing the triumph of good over evil.",
+    coverImage: "/images/durga-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/devi-mahatmyam-durga-saptashati_bengali.pdf" },
+      { label: "Hindi (हिन्दी)", value: "hi", url: "/durga-saptashati-hindi.pdf" },
+    ]
   }
 ];

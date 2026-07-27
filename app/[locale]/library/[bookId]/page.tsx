@@ -4,6 +4,7 @@ import { FlipBookViewer } from "@/components/gita/FlipBookViewer";
 import { Link } from "@/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getTranslations } from "next-intl/server";
 
 interface LibraryBookPageProps {
   params: {
@@ -15,6 +16,8 @@ interface LibraryBookPageProps {
 export default async function LibraryBookPage({ params }: LibraryBookPageProps) {
   const unwrappedParams = await params;
   const book = SPIRITUAL_LIBRARY.find((b) => b.id === unwrappedParams.bookId);
+  const t = await getTranslations({ locale: unwrappedParams.locale, namespace: "Library" });
+  const tBooks = await getTranslations({ locale: unwrappedParams.locale, namespace: "LibraryBooks" });
 
   if (!book) {
     notFound();
@@ -28,14 +31,14 @@ export default async function LibraryBookPage({ params }: LibraryBookPageProps) 
           <Button asChild variant="ghost" className="text-amber-700 hover:text-amber-900 hover:bg-amber-100 dark:text-amber-500 dark:hover:text-amber-400 dark:hover:bg-amber-900/50">
             <Link href="/library">
               <ArrowLeft className="size-4 mr-2" />
-              Back to Library
+              {t("backToLibrary")}
             </Link>
           </Button>
         </div>
 
         <div className="w-full h-[80vh] min-h-[600px]">
           <FlipBookViewer 
-            title={book.title}
+            title={tBooks(`${book.id}.title`)}
             books={book.versions} 
             defaultBook={book.defaultLanguage}
           />

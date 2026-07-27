@@ -60,5 +60,26 @@
   "SEO": {
     "title": "Purohit Booking System — Book a Verified Priest Instantly",
     "description": "An Uber-like platform for booking verified Purohits for Puja, Griha Pravesh, weddings and more."
+  },
+  "Library": {
+    "title": "Spiritual Library",
+    "subtitle": "Discover and read timeless sacred texts, scriptures, and hymns. Choose a book below to start reading.",
+    "readBook": "Read Book",
+    "languages": "{count} Languages",
+    "backToLibrary": "Back to Library"
+  },
+  "LibraryBooks": {
+    "gita": {
+      "title": "Srimad Bhagavad Gita",
+      "description": "The divine wisdom of Lord Krishna, guiding humanity through the battlefield of life with profound spiritual philosophy."
+    },
+    "hanuman-chalisa": {
+      "title": "Hanuman Chalisa",
+      "description": "A Hindu devotional hymn addressed to Lord Hanuman, composed by Tulsidas, invoking courage, devotion, and divine protection."
+    },
+    "durga-saptashati": {
+      "title": "Durga Saptashati (Devi Mahatmyam)",
+      "description": "A profound Hindu philosophical text describing the victory of Goddess Durga over the demon Mahishasura, symbolizing the triumph of good over evil."
+    }
   }
 }
