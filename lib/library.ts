@@ -47,5 +47,16 @@ export const SPIRITUAL_LIBRARY: LibraryBook[] = [
       { label: "Bengali (বাংলা)", value: "bn", url: "/devi-mahatmyam-durga-saptashati_bengali.pdf" },
       { label: "Hindi (हिन्दी)", value: "hi", url: "/durga-saptashati-hindi.pdf" },
     ]
+  },
+  {
+    id: "vishnu-sahasranama",
+    title: "Vishnu Sahasranama",
+    description: "A sacred stotra containing a thousand names of Lord Vishnu, found in the Mahabharata, chanted for spiritual purification and inner peace.",
+    coverImage: "/images/vishnu-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/vishnu-sahasranama-bengali.pdf" },
+      { label: "Hindi (हिन्दी)", value: "hi", url: "/vishnu-sahasranama-hindi.pdf" },
+    ]
   }
 ];

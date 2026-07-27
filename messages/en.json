@@ -80,6 +80,10 @@
     "durga-saptashati": {
       "title": "Durga Saptashati (Devi Mahatmyam)",
       "description": "A profound Hindu philosophical text describing the victory of Goddess Durga over the demon Mahishasura, symbolizing the triumph of good over evil."
+    },
+    "vishnu-sahasranama": {
+      "title": "Vishnu Sahasranama",
+      "description": "A sacred stotra containing a thousand names of Lord Vishnu, found in the Mahabharata, chanted for spiritual purification and inner peace."
     }
   }
 }
