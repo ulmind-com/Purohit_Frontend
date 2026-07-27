@@ -19,6 +19,7 @@ interface RapidoSearchingMapProps {
   budget: number;
   isEPuja?: boolean;
   onCancel: () => void;
+  isCancelling?: boolean;
 }
 
 export function RapidoSearchingMap({
@@ -27,6 +28,7 @@ export function RapidoSearchingMap({
   budget,
   isEPuja,
   onCancel,
+  isCancelling,
 }: RapidoSearchingMapProps) {
   const { isLoaded, loadError } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);
   const [pulseRadius, setPulseRadius] = useState(800);
@@ -200,10 +202,11 @@ export function RapidoSearchingMap({
               variant="ghost"
               size="icon"
               onClick={onCancel}
+              disabled={isCancelling}
               className="size-9 rounded-full hover:bg-destructive/10 hover:text-destructive"
               title="Cancel search"
             >
-              <X className="size-5" />
+              {isCancelling ? <Loader2 className="size-4 animate-spin" /> : <X className="size-5" />}
             </Button>
           </div>
 

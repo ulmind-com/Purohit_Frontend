@@ -46,6 +46,17 @@ export function ActiveBooking() {
     }
   );
 
+  usePusherChannel<{ booking_id: string; reason?: string }>(
+    channelName,
+    'booking_cancelled',
+    (data) => {
+      if (activeBooking && data.booking_id === activeBooking._id) {
+        setBookingStatus('CANCELLED');
+        setCurrentOtp(null);
+      }
+    }
+  );
+
   // Sync OTP from booking if already pending completion (e.g., after page refresh)
   useEffect(() => {
     if (activeBooking && (bookingStatus || activeBooking.status) === 'COMPLETION_PENDING' && !currentOtp && activeBooking.completion_otp) {
@@ -143,6 +154,40 @@ export function ActiveBooking() {
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span>Waiting for Purohit to verify...</span>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {currentStatus === 'CANCELLED' && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/30 dark:bg-black/40 backdrop-blur-md"
+          >
+            <motion.div className="trip-sheet border-none p-8 max-w-sm w-full text-center space-y-6">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", bounce: 0.5 }}
+                className="mx-auto w-20 h-20 bg-destructive/10 text-destructive rounded-full flex items-center justify-center"
+              >
+                <CheckCircle2 className="w-10 h-10" />
+              </motion.div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-bold tracking-tight">Booking Cancelled</h2>
+                <p className="text-muted-foreground text-sm">
+                  The Purohit had to cancel this booking due to an emergency.
+                  Please start a new search.
+                </p>
+              </div>
+              <Button
+                onClick={() => resetBookingState()}
+                className="h-12 w-full rounded-full text-base font-semibold"
+              >
+                Go to Dashboard
+              </Button>
             </motion.div>
           </motion.div>
         )}

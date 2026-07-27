@@ -55,7 +55,7 @@ import { SmartMuhuratTimePicker } from "@/components/booking/SmartMuhuratTimePic
 import { DEFAULT_MAP_CENTER } from "@/lib/constants";
 import { CEREMONY_TYPES } from "@/lib/constants";
 import { bookingWizardSchema, type BookingWizardValues } from "@/lib/validators/booking";
-import { requestBooking } from "@/lib/api/bookings";
+import { requestBooking, cancelSearch } from "@/lib/api/bookings";
 import { getPurohitById } from "@/lib/api/purohits";
 import { usePusherChannel } from "@/hooks/usePusherChannel";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -84,6 +84,7 @@ export function UserBookingWizard() {
   const [step, setStep] = useState<WizardStep>("puja");
   const [bookingId, setBookingId] = useState<string | null>(null);
   const [matchedPurohitId, setMatchedPurohitId] = useState<string | null>(null);
+  const [isCancelling, setIsCancelling] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const userProfile = useAuthStore((s) => s.profile);
@@ -216,7 +217,17 @@ export function UserBookingWizard() {
   }
 
 
-  function retrySearch() {
+  async function retrySearch() {
+    if (bookingId) {
+      try {
+        setIsCancelling(true);
+        await cancelSearch(bookingId);
+      } catch (error) {
+        toast.error("Error cancelling search. Trying to reset anyway.");
+      } finally {
+        setIsCancelling(false);
+      }
+    }
     setBookingId(null);
     setStep("location");
   }
@@ -674,6 +685,7 @@ export function UserBookingWizard() {
               budget={form.getValues("offered_dakshina")}
               isEPuja={form.getValues("isEPuja")}
               onCancel={retrySearch}
+              isCancelling={isCancelling}
             />
           </motion.div>
         )}
