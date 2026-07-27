@@ -20,8 +20,10 @@ export interface BookOption {
 }
 
 interface FlipBookViewerProps {
+  title: string;
   books: BookOption[];
   defaultBook?: string;
+  audioUrl?: string;
 }
 
 interface PdfPageProps {
@@ -60,7 +62,7 @@ const PdfPage = forwardRef<HTMLDivElement, PdfPageProps>(({ pageNumber, isActive
 });
 PdfPage.displayName = "PdfPage";
 
-export function FlipBookViewer({ books, defaultBook }: FlipBookViewerProps) {
+export function FlipBookViewer({ title, books, defaultBook, audioUrl }: FlipBookViewerProps) {
   const [activeBook, setActiveBook] = useState<string>(defaultBook || books[0].value);
   const activePdfUrl = books.find(b => b.value === activeBook)?.url || books[0].url;
 
@@ -120,11 +122,11 @@ export function FlipBookViewer({ books, defaultBook }: FlipBookViewerProps) {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-amber-600">
             <BookOpen className="size-5" />
-            <span className="font-serif font-medium text-amber-950 dark:text-amber-100 hidden sm:inline">Bhagavad Gita</span>
+            <span className="font-serif font-medium text-amber-950 dark:text-amber-100 hidden sm:inline">{title}</span>
           </div>
           
           <Select value={activeBook} onValueChange={handleBookChange}>
-            <SelectTrigger className="w-[180px] h-9 text-sm">
+            <SelectTrigger className="w-[180px] h-9 border-amber-500/30 bg-white/50 dark:bg-black/40 text-amber-900 dark:text-amber-100">
               <SelectValue placeholder="Select Language" />
             </SelectTrigger>
             <SelectContent>
@@ -136,8 +138,17 @@ export function FlipBookViewer({ books, defaultBook }: FlipBookViewerProps) {
             </SelectContent>
           </Select>
         </div>
-        
-        <div className="flex items-center gap-2">
+
+        {audioUrl && (
+            <div className="hidden md:block">
+              <audio controls controlsList="nodownload" className="h-9 w-64 max-w-full">
+                <source src={audioUrl} type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
+            </div>
+          )}
+
+          <div className="flex items-center gap-2">
           <Button variant="outline" size="icon" onClick={zoomOut} className="size-8 rounded-full">
             <ZoomOut className="size-4" />
           </Button>

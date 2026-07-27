@@ -36,7 +36,7 @@ const NAV_LINKS: Record<Role, { href: string; label: any; icon: typeof LayoutGri
   user: [
     { href: "/user", label: "home", icon: LayoutGrid },
     { href: "/search", label: "search", icon: Search },
-    { href: "/gita", label: "gita", icon: BookOpen },
+    { href: "/library", label: "library", icon: BookOpen },
     { href: "/user/book", label: "book", icon: CalendarClock },
     { href: "/user/bookings", label: "bookings", icon: MapPinned },
     { href: "/user/profile", label: "profile", icon: UserIcon },

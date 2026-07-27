@@ -1,0 +1,125 @@
+export interface BookOption {
+  label: string;
+  value: string;
+  url: string;
+}
+
+export interface LibraryBook {
+  id: string;
+  title: string;
+  description: string;
+  coverImage: string;
+  defaultLanguage: string;
+  versions: BookOption[];
+  audioUrl?: string;
+}
+
+export const SPIRITUAL_LIBRARY: LibraryBook[] = [
+  {
+    id: "gita",
+    title: "Srimad Bhagavad Gita",
+    description: "The divine wisdom of Lord Krishna, guiding humanity through the battlefield of life with profound spiritual philosophy.",
+    coverImage: "/images/gita-cover.jpg", // We can use a generic placeholder or an actual image if it exists
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/Bhagavad-gita Bengali.pdf" },
+      { label: "English", value: "en", url: "/Bhagavad-gita-English.pdf" },
+      { label: "Hindi (हिन्दी)", value: "hi", url: "/Bhagavad-gita-Hindi.pdf" },
+    ]
+  },
+  {
+    id: "hanuman-chalisa",
+    title: "Hanuman Chalisa",
+    description: "A Hindu devotional hymn addressed to Lord Hanuman, composed by Tulsidas, invoking courage, devotion, and divine protection.",
+    coverImage: "/images/hanuman-cover.jpg",
+    defaultLanguage: "bn",
+    audioUrl: "/Rasraj Ji Maharaj - Lo-fi Version श्रीहनुमानचालीसा.mp3",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/HANUMAN-CHALISA-BENGALI.pdf" },
+      { label: "Hindi (हिन्दी)", value: "hi", url: "/Sri_Hanuman_Chalisa_Hindi.pdf" },
+    ]
+  },
+  {
+    id: "durga-saptashati",
+    title: "Durga Saptashati (Devi Mahatmyam)",
+    description: "A profound Hindu philosophical text describing the victory of Goddess Durga over the demon Mahishasura, symbolizing the triumph of good over evil.",
+    coverImage: "/images/durga-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/devi-mahatmyam-durga-saptashati_bengali.pdf" },
+      { label: "Hindi (हिन्दी)", value: "hi", url: "/durga-saptashati-hindi.pdf" },
+    ]
+  },
+  {
+    id: "vishnu-sahasranama",
+    title: "Vishnu Sahasranama",
+    description: "A sacred stotra containing a thousand names of Lord Vishnu, found in the Mahabharata, chanted for spiritual purification and inner peace.",
+    coverImage: "/images/vishnu-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/vishnu-sahasranama-bengali.pdf" },
+      { label: "Hindi (हिन्दी)", value: "hi", url: "/vishnu-sahasranama-hindi.pdf" },
+    ]
+  },
+  {
+    id: "satyanarayan-panchali",
+    title: "Sri Sri Satyanarayaner Panchali",
+    description: "The sacred Bengali verses recounting the divine narrative and rituals of Lord Satyanarayan, traditionally read during household Pujas.",
+    coverImage: "/images/satyanarayan-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/srisri-satyanarayaner-panchali-bengali.pdf" }
+    ]
+  },
+  {
+    id: "lokkhi-brotokotha",
+    title: "Maa Lokkhi Brotokotha",
+    description: "The sacred Bengali verses and stories of Goddess Lakshmi, recited every Thursday in Bengali households for wealth and prosperity.",
+    coverImage: "/images/lokkhi-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/Lokkhi-Brotokotha-Bengali.pdf" }
+    ]
+  },
+  {
+    id: "purohit-darpan",
+    title: "Purohit Darpan",
+    description: "The ultimate Bengali reference manual for Hindu priests (Purohits) detailing the meticulous rules, mantras, and procedures for conducting various Pujas and Sanskaras.",
+    coverImage: "/images/purohit-darpan-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/Purohit-Darpan-Bengali.pdf" }
+    ]
+  },
+  {
+    id: "bishuddha-nityakarma-paddhati",
+    title: "Bishuddha Nityakarma Paddhati",
+    description: "A comprehensive Bengali guide outlining the daily religious duties, rituals, and prayers essential for maintaining a disciplined spiritual life.",
+    coverImage: "/images/nityakarma-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/বিশুদ্ধ_নিত্যকর্ম্ম_পদ্ধতি-Bengali.pdf" }
+    ]
+  },
+  {
+    id: "ramayana",
+    title: "Valmiki Ramayana",
+    description: "The epic narrative of Lord Rama, illustrating the ideals of dharma, devotion, and righteousness as chronicled by Sage Valmiki.",
+    coverImage: "/images/ramayana-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/Balmiki-Ramayan-Hemchandra-Bhattacharyya-Bengali.pdf" },
+      { label: "Hindi (हिन्दी)", value: "hi", url: "/Valmiki-Ramayana-Hindi.pdf" },
+    ]
+  },
+  {
+    id: "sri-isopanisad",
+    title: "Sri Isopanisad",
+    description: "One of the principal Upanishads conveying the essence of Vedic knowledge, teaching that everything in the universe belongs to the Supreme Lord.",
+    coverImage: "/images/isopanisad-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/isopanisad-Bengali.pdf" }
+    ]
+  }
+];
