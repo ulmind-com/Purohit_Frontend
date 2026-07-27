@@ -104,6 +104,10 @@
     "ramayana": {
       "title": "Valmiki Ramayana",
       "description": "The epic narrative of Lord Rama, illustrating the ideals of dharma, devotion, and righteousness as chronicled by Sage Valmiki."
+    },
+    "sri-isopanisad": {
+      "title": "Sri Isopanisad",
+      "description": "One of the principal Upanishads conveying the essence of Vedic knowledge, teaching that everything in the universe belongs to the Supreme Lord."
     }
   }
 }

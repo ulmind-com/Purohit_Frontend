@@ -109,5 +109,15 @@ export const SPIRITUAL_LIBRARY: LibraryBook[] = [
       { label: "Bengali (বাংলা)", value: "bn", url: "/Balmiki-Ramayan-Hemchandra-Bhattacharyya-Bengali.pdf" },
       { label: "Hindi (हिन्दी)", value: "hi", url: "/Valmiki-Ramayana-Hindi.pdf" },
     ]
+  },
+  {
+    id: "sri-isopanisad",
+    title: "Sri Isopanisad",
+    description: "One of the principal Upanishads conveying the essence of Vedic knowledge, teaching that everything in the universe belongs to the Supreme Lord.",
+    coverImage: "/images/isopanisad-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/isopanisad-Bengali.pdf" }
+    ]
   }
 ];
