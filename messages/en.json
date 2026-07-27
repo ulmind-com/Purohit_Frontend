@@ -96,6 +96,14 @@
     "purohit-darpan": {
       "title": "Purohit Darpan",
       "description": "The ultimate Bengali reference manual for Hindu priests (Purohits) detailing the meticulous rules, mantras, and procedures for conducting various Pujas and Sanskaras."
+    },
+    "bishuddha-nityakarma-paddhati": {
+      "title": "Bishuddha Nityakarma Paddhati",
+      "description": "A comprehensive Bengali guide outlining the daily religious duties, rituals, and prayers essential for maintaining a disciplined spiritual life."
+    },
+    "ramayana": {
+      "title": "Valmiki Ramayana",
+      "description": "The epic narrative of Lord Rama, illustrating the ideals of dharma, devotion, and righteousness as chronicled by Sage Valmiki."
     }
   }
 }

@@ -88,5 +88,26 @@ export const SPIRITUAL_LIBRARY: LibraryBook[] = [
     versions: [
       { label: "Bengali (বাংলা)", value: "bn", url: "/Purohit-Darpan-Bengali.pdf" }
     ]
+  },
+  {
+    id: "bishuddha-nityakarma-paddhati",
+    title: "Bishuddha Nityakarma Paddhati",
+    description: "A comprehensive Bengali guide outlining the daily religious duties, rituals, and prayers essential for maintaining a disciplined spiritual life.",
+    coverImage: "/images/nityakarma-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/বিশুদ্ধ_নিত্যকর্ম্ম_পদ্ধতি-Bengali.pdf" }
+    ]
+  },
+  {
+    id: "ramayana",
+    title: "Valmiki Ramayana",
+    description: "The epic narrative of Lord Rama, illustrating the ideals of dharma, devotion, and righteousness as chronicled by Sage Valmiki.",
+    coverImage: "/images/ramayana-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/Balmiki-Ramayan-Hemchandra-Bhattacharyya-Bengali.pdf" },
+      { label: "Hindi (हिन्दी)", value: "hi", url: "/Valmiki-Ramayana-Hindi.pdf" },
+    ]
   }
 ];
