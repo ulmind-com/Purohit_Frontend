@@ -11,6 +11,7 @@ export interface LibraryBook {
   coverImage: string;
   defaultLanguage: string;
   versions: BookOption[];
+  audioUrl?: string;
 }
 
 export const SPIRITUAL_LIBRARY: LibraryBook[] = [
@@ -32,6 +33,7 @@ export const SPIRITUAL_LIBRARY: LibraryBook[] = [
     description: "A Hindu devotional hymn addressed to Lord Hanuman, composed by Tulsidas, invoking courage, devotion, and divine protection.",
     coverImage: "/images/hanuman-cover.jpg",
     defaultLanguage: "bn",
+    audioUrl: "/Rasraj Ji Maharaj - Lo-fi Version श्रीहनुमानचालीसा.mp3",
     versions: [
       { label: "Bengali (বাংলা)", value: "bn", url: "/HANUMAN-CHALISA-BENGALI.pdf" },
       { label: "Hindi (हिन्दी)", value: "hi", url: "/Sri_Hanuman_Chalisa_Hindi.pdf" },

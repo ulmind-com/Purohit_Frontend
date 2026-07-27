@@ -41,6 +41,7 @@ export default async function LibraryBookPage({ params }: LibraryBookPageProps) 
             title={tBooks(`${book.id}.title`)}
             books={book.versions} 
             defaultBook={book.defaultLanguage}
+            audioUrl={book.audioUrl}
           />
         </div>
         
