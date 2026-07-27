@@ -68,5 +68,15 @@ export const SPIRITUAL_LIBRARY: LibraryBook[] = [
     versions: [
       { label: "Bengali (বাংলা)", value: "bn", url: "/srisri-satyanarayaner-panchali-bengali.pdf" }
     ]
+  },
+  {
+    id: "lokkhi-brotokotha",
+    title: "Maa Lokkhi Brotokotha",
+    description: "The sacred Bengali verses and stories of Goddess Lakshmi, recited every Thursday in Bengali households for wealth and prosperity.",
+    coverImage: "/images/lokkhi-cover.jpg",
+    defaultLanguage: "bn",
+    versions: [
+      { label: "Bengali (বাংলা)", value: "bn", url: "/Lokkhi-Brotokotha-Bengali.pdf" }
+    ]
   }
 ];
