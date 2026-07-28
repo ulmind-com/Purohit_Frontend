@@ -9,6 +9,7 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/navigation";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Footer } from "@/components/shared/footer";
 
 // Bound to `--font-sans` (not `--font-geist-sans`) because app/globals.css's
@@ -76,6 +77,7 @@ export default async function RootLayout({
             </main>
             <Footer />
             <Analytics />
+            <SpeedInsights />
           </NextIntlClientProvider>
         </AppProviders>
       </body>
