@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { GoogleMap, useJsApiLoader, Circle, Marker } from "@react-google-maps/api";
 import { Loader2, Map as MapIcon } from "lucide-react";
-import api from "@/lib/api/axios";
+import { api } from "@/lib/api/axios";
 
 // Map container styling
 const containerStyle = {

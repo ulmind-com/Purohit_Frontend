@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Loader2, ShieldCheck, XCircle } from "lucide-react";
-import api from "@/lib/api/axios";
+import { api } from "@/lib/api/axios";
 
 interface PendingPurohit {
   id: string;

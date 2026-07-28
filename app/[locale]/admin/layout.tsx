@@ -1,14 +1,16 @@
 import { redirect } from "@/navigation";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth"; // Assuming authOptions is exported from here
+import { cookies } from "next/headers";
+import { ROLE_COOKIE_NAME } from "@/lib/constants";
 import { LayoutDashboard, Map, ShieldCheck, Users, Settings } from "lucide-react";
 import { Link } from "@/navigation";
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await getServerSession(authOptions);
+export default async function AdminLayout({ children, params }: { children: React.ReactNode, params: Promise<{ locale: string }> }) {
+  const resolvedParams = await params;
+  const cookieStore = await cookies();
+  const role = cookieStore.get(ROLE_COOKIE_NAME)?.value;
 
-  if (!session || session.user.role !== "SUPER_ADMIN") {
-    redirect("/login");
+  if (role !== "SUPER_ADMIN") {
+    redirect({ href: "/login", locale: resolvedParams.locale });
   }
 
   const navItems = [
