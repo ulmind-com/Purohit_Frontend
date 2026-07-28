@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, TrendingUp, Users, FileText, Wallet } from "lucide-react";
-import api from "@/lib/api/axios";
+import { api } from "@/lib/api/axios";
 
 interface DashboardStats {
   total_revenue: number;

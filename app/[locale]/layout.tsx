@@ -8,6 +8,8 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/navigation";
+import { Analytics } from "@vercel/analytics/next";
+import { Footer } from "@/components/shared/footer";
 
 // Bound to `--font-sans` (not `--font-geist-sans`) because app/globals.css's
 // shadcn `@theme` block reads `--font-sans` directly.
@@ -69,7 +71,11 @@ export default async function RootLayout({
         <AppProviders>
           <NextIntlClientProvider messages={messages} locale={locale}>
             <AuroraBackground />
-            {children}
+            <main className="flex-1 w-full relative z-10 flex flex-col">
+              {children}
+            </main>
+            <Footer />
+            <Analytics />
           </NextIntlClientProvider>
         </AppProviders>
       </body>
