@@ -12,6 +12,7 @@ import {
   Search,
   BookOpen,
   User as UserIcon,
+  Flame,
 } from "lucide-react";
 
 import { Logo } from "@/components/shared/logo";
@@ -36,6 +37,7 @@ const NAV_LINKS: Record<Role, { href: string; label: any; icon: typeof LayoutGri
   user: [
     { href: "/user", label: "home", icon: LayoutGrid },
     { href: "/search", label: "search", icon: Search },
+    { href: "/darshan", label: "darshan", icon: Flame },
     { href: "/library", label: "library", icon: BookOpen },
     { href: "/user/book", label: "book", icon: CalendarClock },
     { href: "/user/bookings", label: "bookings", icon: MapPinned },
@@ -43,6 +45,8 @@ const NAV_LINKS: Record<Role, { href: string; label: any; icon: typeof LayoutGri
   ],
   purohit: [
     { href: "/purohit", label: "home", icon: LayoutGrid },
+    { href: "/darshan", label: "darshan", icon: Flame },
+    { href: "/library", label: "library", icon: BookOpen },
     { href: "/purohit/zones", label: "zones", icon: Map },
     { href: "/purohit/bookings", label: "bookings", icon: MapPinned },
     { href: "/purohit/profile", label: "profile", icon: Settings },
