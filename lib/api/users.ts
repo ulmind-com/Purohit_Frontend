@@ -22,8 +22,13 @@ export async function updateMyProfile(payload: UserUpdatePayload) {
   return data;
 }
 
-export async function getAstrologyInsights() {
-  const { data } = await api.get("/users/me/astrology-insights");
+export async function getAstrologyInsights(lang: string = "en") {
+  const { data } = await api.get(`/users/me/astrology-insights?lang=${lang}`);
+  return data;
+}
+
+export async function getDailyHoroscope(lang: string = "en") {
+  const { data } = await api.get(`/users/me/daily-horoscope?lang=${lang}`);
   return data;
 }
 
