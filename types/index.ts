@@ -34,7 +34,18 @@ export interface CurrentDasha {
   dasha_name: string;
   end_date: string;
   recommended_puja_name: string;
+  is_favorable?: boolean;
+  favorable_effects?: string;
+  unfavorable_effects?: string;
+  remedies?: string[];
   updated_at: string;
+}
+
+export interface DailyHoroscope {
+  prediction: string;
+  lucky_color: string;
+  lucky_number: number;
+  rashi: string;
 }
 
 export interface UserResponse {

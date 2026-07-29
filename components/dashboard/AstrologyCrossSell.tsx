@@ -8,20 +8,22 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Calendar, ArrowRight, ActivitySquare } from "lucide-react";
 import { useRouter } from "@/navigation";
 import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import type { CurrentDasha, UserResponse } from "@/types";
 
 export function AstrologyCrossSell() {
   const t = useTranslations("Dashboard");
+  const locale = useLocale();
   const userStoreProfile = useAuthStore((s) => s.profile);
   const profile = userStoreProfile as UserResponse | null;
   const router = useRouter();
 
   const hasBirthDetails = !!(profile?.dob);
+  const today = new Date().toISOString().split('T')[0];
 
   const { data: dasha, isLoading, isError } = useQuery<CurrentDasha>({
-    queryKey: ["astrology-insights", profile?._id],
-    queryFn: getAstrologyInsights,
+    queryKey: ["astrology-insights", profile?._id, profile?.dob, profile?.rashi, profile?.gotra, today, locale],
+    queryFn: () => getAstrologyInsights(locale),
     enabled: hasBirthDetails && !!profile,
     retry: false,
   });
@@ -75,23 +77,61 @@ export function AstrologyCrossSell() {
               <Sparkles className="w-8 h-8 text-purple-300" />
             </div>
             <div className="flex-1 text-center sm:text-left space-y-1">
-              <h3 className="text-lg font-bold text-white flex items-center justify-center sm:justify-start gap-2">
+              <h3 className="text-lg font-bold text-white flex flex-wrap items-center justify-center sm:justify-start gap-2">
                 {t("cosmicInsight")}
                 <span className="px-2 py-0.5 rounded-full text-[10px] uppercase font-bold bg-purple-500/30 text-purple-200 border border-purple-500/50">
                   {dasha.dasha_name} Mahadasha
                 </span>
+                {dasha.is_favorable !== undefined && (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold border ${dasha.is_favorable ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50" : "bg-rose-500/20 text-rose-400 border-rose-500/50"}`}>
+                    {dasha.is_favorable ? (locale === "bn" ? "শুভ" : "Favorable") : (locale === "bn" ? "অশুভ" : "Unfavorable")}
+                  </span>
+                )}
               </h3>
-              <p className="text-sm text-purple-100/80 leading-relaxed">
+              <p className="text-sm text-purple-100/80 leading-relaxed mb-4">
                 {t("underInfluenceOf")} <strong className="text-white">{dasha.dasha_name}</strong>. 
                 {t("recommendPerforming")} <strong className="text-saffron-400">{dasha.recommended_puja_name}</strong> {t("toHarmonizeEnergy")}
               </p>
+              
+              <div className="mt-4 pt-4 border-t border-purple-500/30">
+                {dasha.is_favorable ? (
+                  dasha.favorable_effects && (
+                    <div className="text-sm">
+                      <strong className="text-emerald-400 block mb-1">✨ {locale === "bn" ? "প্রভাব (শুভ):" : "Effects (Favorable):"}</strong>
+                      <p className="text-emerald-100/80 leading-relaxed">{dasha.favorable_effects}</p>
+                    </div>
+                  )
+                ) : (
+                  <div className="space-y-4">
+                    {dasha.unfavorable_effects && (
+                      <div className="text-sm">
+                        <strong className="text-rose-400 block mb-1">⚠️ {locale === "bn" ? "প্রভাব (অশুভ):" : "Effects (Unfavorable):"}</strong>
+                        <p className="text-rose-100/80 leading-relaxed">{dasha.unfavorable_effects}</p>
+                      </div>
+                    )}
+                    
+                    {dasha.remedies && dasha.remedies.length > 0 && (
+                      <div className="text-sm bg-black/20 p-3 rounded-lg border border-purple-500/20">
+                        <strong className="text-saffron-400 block mb-2">🛡️ {locale === "bn" ? "প্রতিকার (Remedies):" : "Remedies to protect yourself:"}</strong>
+                        <ul className="list-disc list-inside text-purple-100/80 space-y-1">
+                          {dasha.remedies.map((remedy, idx) => (
+                            <li key={idx}>{remedy}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
-            <Button 
-              onClick={() => router.push(`/user/book?ceremony=${encodeURIComponent(dasha.recommended_puja_name)}`)}
-              className="shrink-0 rounded-full h-11 px-6 bg-gradient-to-r from-saffron-500 to-saffron-600 hover:from-saffron-400 hover:to-saffron-500 text-white font-bold shadow-[0_0_15px_rgba(249,115,22,0.4)] hover:shadow-[0_0_25px_rgba(249,115,22,0.6)] transition-all animate-pulse hover:animate-none"
-            >
-              {t("bookSpecificPuja", { pujaName: dasha.recommended_puja_name })}
-            </Button>
+            <div className="flex flex-col gap-3 shrink-0">
+              <Button 
+                onClick={() => router.push(`/user/book?ceremony=${encodeURIComponent(dasha.recommended_puja_name)}`)}
+                className="w-full rounded-full h-11 px-6 bg-gradient-to-r from-saffron-500 to-saffron-600 hover:from-saffron-400 hover:to-saffron-500 text-white font-bold shadow-[0_0_15px_rgba(249,115,22,0.4)] hover:shadow-[0_0_25px_rgba(249,115,22,0.6)] transition-all animate-pulse hover:animate-none"
+              >
+                {t("bookSpecificPuja", { pujaName: dasha.recommended_puja_name })}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </motion.div>
