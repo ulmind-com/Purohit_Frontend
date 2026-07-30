@@ -20,7 +20,7 @@ import { Logo } from "@/components/shared/logo";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { LanguageSwitcher } from "@/components/navigation/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -115,6 +115,7 @@ export function Navbar({ role }: { role: Role }) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2 px-2">
                   <Avatar className="size-8 ring-2 ring-saffron-500/20">
+                    <AvatarImage key={profile?.profile_picture || "empty"} src={profile?.profile_picture || ""} alt={profile?.name || ""} />
                     <AvatarFallback className="saffron-gradient text-xs text-white">
                       {initials}
                     </AvatarFallback>

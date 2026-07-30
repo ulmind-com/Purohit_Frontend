@@ -26,6 +26,7 @@ import { STATUS_BADGE_VARIANT } from "@/lib/booking-status";
 import { ActiveBooking } from "@/app/[locale]/(dashboard)/user/components/ActiveBooking";
 import { AstrologyCrossSell } from "@/components/dashboard/AstrologyCrossSell";
 import { DailyHoroscopeWidget } from "@/components/dashboard/DailyHoroscopeWidget";
+import { HanumanChalisaWidget } from "@/components/dashboard/HanumanChalisaWidget";
 import { useEffect } from "react";
 
 export function UserBentoDashboard() {
@@ -69,6 +70,8 @@ export function UserBentoDashboard() {
       <AstrologyCrossSell />
       
       <DailyHoroscopeWidget />
+
+      <HanumanChalisaWidget />
       
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Hero CTA tile */}

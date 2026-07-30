@@ -88,8 +88,8 @@ export function JapMalaLeaderboard() {
               <div className="flex items-center gap-4">
                 <div className="flex w-8 justify-center">{getRankBadge(entry.rank)}</div>
                 <Avatar className="size-10 ring-2 ring-orange-500/20">
-                  <AvatarImage src={entry.user_avatar || ""} />
-                  <AvatarFallback className="bg-gradient-to-br from-orange-400 to-red-500 text-white">
+                  <AvatarImage key={entry.user_avatar || entry.user_name} src={entry.user_avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(entry.user_name)}&backgroundColor=ea580c&textColor=ffffff`} />
+                  <AvatarFallback className="bg-gradient-to-br from-orange-400 to-red-500 text-white font-bold">
                     {entry.user_name.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
