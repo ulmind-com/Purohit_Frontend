@@ -215,7 +215,9 @@ export default function UserProfilePage() {
           <div className="relative group cursor-pointer" onClick={() => !isUploadingPhoto && fileInputRef.current?.click()}>
             <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#FF7A00] to-[#FF004D] blur-md opacity-30 animate-pulse"></div>
             <Avatar className="w-24 h-24 border-2 border-background shadow-xl relative z-10 overflow-hidden transition-all duration-300">
-              <AvatarImage src={profile.profile_picture || ""} alt="Profile" className={isUploadingPhoto ? "opacity-50 blur-sm" : ""} />
+              {profile.profile_picture && (
+                <AvatarImage src={profile.profile_picture} alt="Profile" className={isUploadingPhoto ? "opacity-50 blur-sm" : ""} />
+              )}
               <AvatarFallback className="text-3xl font-bold bg-gradient-to-br from-[#FF7A00] to-[#FF004D] text-white">
                 {getInitials(currentName || "User")}
               </AvatarFallback>
