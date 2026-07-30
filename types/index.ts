@@ -309,3 +309,30 @@ export interface FirebaseOnboardPayload {
   role: "user" | "purohit";
   phone_number: string;
 }
+
+// Hanuman Chalisa Challenge
+export interface ChalisaWeekDay {
+  day: string;
+  date: string;
+  full_date: string;
+  completed: boolean;
+  is_today: boolean;
+  is_future: boolean;
+}
+
+export interface ChalisaStatusResponse {
+  streak_count: number;
+  best_streak: number;
+  total_reads: number;
+  completed_today: boolean;
+  weekly_status: ChalisaWeekDay[];
+}
+
+export interface ChalisaCompleteResponse {
+  streak_count: number;
+  best_streak: number;
+  total_reads: number;
+  next_milestone: number;
+  milestone_progress: string;
+  milestone_message: string;
+}
