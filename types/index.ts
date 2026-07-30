@@ -290,3 +290,22 @@ export interface AstrologyMetadata {
   nakshatras: string[];
 }
 
+// Firebase Auth Types
+export interface FirebaseSyncResponse {
+  status: "LOGGED_IN" | "NEW_USER" | "SUCCESS";
+  token?: string;
+  role?: Role;
+  firebase_uid?: string;
+  email?: string;
+  name?: string;
+  picture?: string;
+}
+
+export interface FirebaseOnboardPayload {
+  firebase_uid: string;
+  email: string;
+  name: string;
+  picture?: string;
+  role: "user" | "purohit";
+  phone_number: string;
+}

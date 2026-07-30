@@ -1,11 +1,12 @@
 import { api } from "@/lib/api/axios";
-import type { LoginResponse, PurohitResponse, Role, UserResponse } from "@/types";
+import type { LoginResponse, PurohitResponse, Role, UserResponse, FirebaseSyncResponse, FirebaseOnboardPayload } from "@/types";
 
 export interface SignupUserPayload {
   name: string;
   email: string;
   mobile_number: string;
   password: string;
+  firebase_uid?: string;
 }
 
 export interface SignupPurohitPayload {
@@ -18,6 +19,7 @@ export interface SignupPurohitPayload {
   address_text?: string;
   service_radius_km: number;
   price: number;
+  firebase_uid?: string;
 }
 
 /**
@@ -51,6 +53,21 @@ export async function signupPurohit(payload: SignupPurohitPayload) {
 
 export async function logout() {
   const { data } = await api.post<{ message: string }>("/auth/logout");
+  return data;
+}
+
+export async function firebaseSync(idToken: string) {
+  const { data } = await api.post<FirebaseSyncResponse>("/auth/firebase-sync", {
+    id_token: idToken,
+  });
+  return data;
+}
+
+export async function firebaseOnboard(payload: FirebaseOnboardPayload) {
+  const { data } = await api.post<FirebaseSyncResponse>(
+    "/auth/firebase-onboard",
+    payload
+  );
   return data;
 }
 
