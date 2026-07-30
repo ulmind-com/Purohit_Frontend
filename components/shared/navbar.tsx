@@ -13,6 +13,7 @@ import {
   BookOpen,
   User as UserIcon,
   Flame,
+  Disc,
 } from "lucide-react";
 
 import { Logo } from "@/components/shared/logo";
@@ -41,6 +42,7 @@ const NAV_LINKS: Record<Role, { href: string; label: any; icon: typeof LayoutGri
     { href: "/library", label: "library", icon: BookOpen },
     { href: "/user/book", label: "book", icon: CalendarClock },
     { href: "/user/bookings", label: "bookings", icon: MapPinned },
+    { href: "/user/jap-mala", label: "japMala", icon: Disc },
     { href: "/user/profile", label: "profile", icon: UserIcon },
   ],
   purohit: [
@@ -49,6 +51,7 @@ const NAV_LINKS: Record<Role, { href: string; label: any; icon: typeof LayoutGri
     { href: "/library", label: "library", icon: BookOpen },
     { href: "/purohit/zones", label: "zones", icon: Map },
     { href: "/purohit/bookings", label: "bookings", icon: MapPinned },
+    { href: "/user/jap-mala", label: "japMala", icon: Disc },
     { href: "/purohit/profile", label: "profile", icon: Settings },
   ],
 };
