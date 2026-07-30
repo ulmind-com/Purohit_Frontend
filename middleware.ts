@@ -21,7 +21,7 @@ export function middleware(request: NextRequest) {
   const role = request.cookies.get(ROLE_COOKIE_NAME)?.value;
   const isAuthed = Boolean(token && role);
 
-  const isAuthPage = pathname === "/login" || pathname === "/signup";
+  const isAuthPage = pathname === "/login" || pathname === "/signup" || pathname === "/onboarding";
   const isUserArea = pathname.startsWith("/user");
   const isPurohitArea = pathname.startsWith("/purohit");
 
