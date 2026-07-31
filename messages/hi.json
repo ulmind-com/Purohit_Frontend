@@ -36,7 +36,11 @@
     "profileSettings": "प्रोफ़ाइल सेटिंग्स",
     "japMala": "108 जप माला",
     "signOut": "साइन आउट",
-    "payouts": "पेआउट"
+    "payouts": "पेआउट",
+    "users": "उपयोगकर्ता",
+    "purohits": "पुरोहित",
+    "financials": "वित्तीय",
+    "settings": "सेटिंग्स"
   },
   "Booking": {
     "bookPujaTitle": "पूजा बुक करें",

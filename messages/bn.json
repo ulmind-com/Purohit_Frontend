@@ -36,7 +36,11 @@
     "profileSettings": "প্রোফাইল সেটিংস",
     "japMala": "১০৮ জপ মালা",
     "signOut": "লগ আউট",
-    "payouts": "পেআউট"
+    "payouts": "পেআউট",
+    "users": "ব্যবহারকারী",
+    "purohits": "পুরোহিতগণ",
+    "financials": "আর্থিক বিবরণ",
+    "settings": "সেটিংস"
   },
   "Booking": {
     "bookPujaTitle": "পূজা বুক করুন",

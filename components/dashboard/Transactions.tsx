@@ -49,7 +49,7 @@ export function Transactions() {
       cell: ({ row }) => {
         const status = row.original.status;
         let variant: "default" | "secondary" | "destructive" | "outline" = "default";
-        let label = status;
+        let label: string = status;
         
         if (status === "PAYOUT_SUCCESS" || status === "PAID") variant = "default";
         else if (status === "PAYOUT_PROCESSING") { variant = "secondary"; label = "PROCESSING"; }

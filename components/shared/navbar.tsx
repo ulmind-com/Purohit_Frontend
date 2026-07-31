@@ -5,16 +5,21 @@ import { useTranslations } from "next-intl";
 import {
   CalendarClock,
   LayoutGrid,
-  LogOut,
-  MapPinned,
   Map,
-  Settings,
+  MapPinned,
+  Menu,
+  Moon,
   Search,
-  BookOpen,
+  Settings,
+  Sun,
   User as UserIcon,
+  Users,
+  Building2,
   Flame,
   Disc,
   Banknote,
+  LogOut,
+  BookOpen,
 } from "lucide-react";
 
 import { Logo } from "@/components/shared/logo";
@@ -55,6 +60,13 @@ const NAV_LINKS: Record<Role, { href: string; label: any; icon: typeof LayoutGri
     { href: "/user/jap-mala", label: "japMala", icon: Disc },
     { href: "/purohit/payment-settings", label: "payouts", icon: Banknote },
     { href: "/purohit/profile", label: "profile", icon: Settings },
+  ],
+  SUPER_ADMIN: [
+    { href: "/admin", label: "home", icon: LayoutGrid },
+    { href: "/admin/users", label: "users", icon: Users },
+    { href: "/admin/purohits", label: "purohits", icon: UserIcon },
+    { href: "/admin/financials", label: "financials", icon: Banknote },
+    { href: "/admin/settings", label: "settings", icon: Settings },
   ],
 };
 

@@ -36,7 +36,11 @@
     "profileSettings": "Profile settings",
     "japMala": "108 Jap Mala",
     "signOut": "Sign out",
-    "payouts": "Payouts"
+    "payouts": "Payouts",
+    "users": "Users",
+    "purohits": "Purohits",
+    "financials": "Financials",
+    "settings": "Settings"
   },
   "Booking": {
     "bookPujaTitle": "Book a Puja",
