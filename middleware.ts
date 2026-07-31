@@ -24,25 +24,29 @@ export function middleware(request: NextRequest) {
   const isAuthPage = pathname === "/login" || pathname === "/signup" || pathname === "/onboarding";
   const isUserArea = pathname.startsWith("/user");
   const isPurohitArea = pathname.startsWith("/purohit");
+  const isAdminArea = pathname.startsWith("/admin");
 
   if (isAuthed && isAuthPage) {
-    return NextResponse.redirect(
-      new URL(role === "purohit" ? "/purohit" : "/user", request.url)
-    );
+    if (role === "SUPER_ADMIN") return NextResponse.redirect(new URL("/admin", request.url));
+    return NextResponse.redirect(new URL(role === "purohit" ? "/purohit" : "/user", request.url));
   }
 
-  if (!isAuthed && (isUserArea || isPurohitArea)) {
+  if (!isAuthed && (isUserArea || isPurohitArea || isAdminArea)) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isAuthed && isUserArea && role !== "user") {
-    return NextResponse.redirect(new URL("/purohit", request.url));
-  }
-
-  if (isAuthed && isPurohitArea && role !== "purohit") {
-    return NextResponse.redirect(new URL("/user", request.url));
+  if (isAuthed) {
+    if (isAdminArea && role !== "SUPER_ADMIN") {
+      return NextResponse.redirect(new URL(role === "purohit" ? "/purohit" : "/user", request.url));
+    }
+    if (isUserArea && role !== "user") {
+      return NextResponse.redirect(new URL(role === "SUPER_ADMIN" ? "/admin" : "/purohit", request.url));
+    }
+    if (isPurohitArea && role !== "purohit") {
+      return NextResponse.redirect(new URL(role === "SUPER_ADMIN" ? "/admin" : "/user", request.url));
+    }
   }
 
   return response;

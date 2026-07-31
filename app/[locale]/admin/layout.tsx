@@ -1,7 +1,7 @@
 import { redirect } from "@/navigation";
 import { cookies } from "next/headers";
 import { ROLE_COOKIE_NAME } from "@/lib/constants";
-import { LayoutDashboard, Map, ShieldCheck, Users, Settings } from "lucide-react";
+import { LayoutDashboard, Map, ShieldCheck, Users, Settings, Banknote } from "lucide-react";
 import { Link } from "@/navigation";
 
 export default async function AdminLayout({ children, params }: { children: React.ReactNode, params: Promise<{ locale: string }> }) {
@@ -18,6 +18,7 @@ export default async function AdminLayout({ children, params }: { children: Reac
     { name: "God View Map", href: "/admin/live-map", icon: Map },
     { name: "KYC Approvals", href: "/admin/kyc-approvals", icon: ShieldCheck },
     { name: "Users & Purohits", href: "/admin/users", icon: Users },
+    { name: "Financials", href: "/admin/financials", icon: Banknote },
     { name: "Settings", href: "/admin/settings", icon: Settings },
   ];
 
