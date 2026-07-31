@@ -55,6 +55,18 @@ export async function setOnlineStatus(is_online: boolean) {
   return updateMyPurohitProfile({ is_online });
 }
 
+export interface PayoutSetupPayload {
+  payout_method: "UPI" | "BANK";
+  upi_id?: string;
+  bank_account_number?: string;
+  ifsc_code?: string;
+}
+
+export async function setupPayout(payload: PayoutSetupPayload) {
+  const { data } = await api.post("/purohits/payout-setup", payload);
+  return data;
+}
+
 /**
  * There is no `GET /purohits/{id}` endpoint, so once a Yajman's booking is
  * accepted (the Pusher `booking_accepted` event only carries `purohit_id`),

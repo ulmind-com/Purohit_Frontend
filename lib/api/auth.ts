@@ -72,5 +72,6 @@ export async function firebaseOnboard(payload: FirebaseOnboardPayload) {
 }
 
 export function roleHomePath(role: Role) {
+  if (role === "SUPER_ADMIN") return "/admin";
   return role === "purohit" ? "/purohit" : "/user";
 }

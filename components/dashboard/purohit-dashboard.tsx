@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ApiErrorAlert } from "@/components/shared/api-error-alert";
@@ -34,6 +34,7 @@ import type {
 import { ActiveBooking } from "@/app/[locale]/(dashboard)/purohit/components/ActiveBooking";
 import { useEffect } from "react";
 import { OnlineToggle } from "@/app/[locale]/(dashboard)/purohit/components/OnlineToggle";
+import { Transactions } from "@/components/dashboard/Transactions";
 
 export function PurohitDashboard() {
   const profile = useAuthStore((s) => s.profile) as PurohitResponse | null;
@@ -48,7 +49,7 @@ export function PurohitDashboard() {
     // Refresh profile on mount to get latest rating/stats
     fetchMyPurohitProfile().then((freshProfile) => {
       setProfile(freshProfile);
-    }).catch(console.error);
+    }).catch((err) => console.error("Failed to fetch profile", err));
   }, [setProfile]);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
 
@@ -198,6 +199,16 @@ export function PurohitDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Transactions</CardTitle>
+          <CardDescription>View your latest payouts and earnings.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Transactions />
+        </CardContent>
+      </Card>
     </div>
   );
 }

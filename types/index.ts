@@ -3,7 +3,7 @@
  * from the wire contract. See `Purohit_Backend/app/models/*.py`.
  */
 
-export type Role = "user" | "purohit";
+export type Role = "user" | "purohit" | "SUPER_ADMIN";
 
 /** GeoJSON Point — coordinates are always [longitude, latitude]. */
 export interface GeoJSONPoint {
@@ -126,6 +126,10 @@ export interface PurohitResponse {
   address_text: string | null;
   rating: number;
   total_reviews: number;
+  payout_method?: "UPI" | "BANK";
+  upi_id?: string;
+  bank_account_number?: string;
+  ifsc_code?: string;
   price: number;
   is_available: boolean;
   is_online: boolean;
