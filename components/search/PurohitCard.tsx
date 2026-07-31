@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Star, Play, Pause, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { DirectBookModal } from "./DirectBookModal";
+import { PurohitProfileModal } from "./PurohitProfileModal";
 
 interface PurohitCardProps {
   purohit: {
@@ -16,6 +17,7 @@ interface PurohitCardProps {
     tradition: string;
     expertise: string[];
     rating: number;
+    total_reviews: number;
     price: number;
     experience_years: number;
     education_upadhi: string;
@@ -34,6 +36,7 @@ export function PurohitCard({ purohit }: PurohitCardProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const toggleAudio = () => {
     if (!audioRef.current) return;
@@ -118,7 +121,8 @@ export function PurohitCard({ purohit }: PurohitCardProps) {
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Star className="size-4 fill-amber-500 text-amber-500" />
-                <span className="font-medium text-foreground">{purohit.rating.toFixed(1)}</span>
+                <span className="font-medium text-foreground">{purohit.rating?.toFixed(1) || "0.0"}</span>
+                <span className="text-muted-foreground ml-1">({purohit.total_reviews || 0})</span>
               </div>
               <div className="flex items-center gap-1">
                 <MapPin className="size-4" />
@@ -148,12 +152,21 @@ export function PurohitCard({ purohit }: PurohitCardProps) {
             <p className="text-xs text-muted-foreground">Starting Dakshina</p>
             <p className="text-2xl font-bold text-foreground">₹{purohit.price}</p>
           </div>
-          <Button 
-            className="w-full bg-gradient-to-r from-saffron-500 to-marigold-500 hover:from-saffron-600 hover:to-marigold-600 text-white sm:w-auto"
-            onClick={() => setIsModalOpen(true)}
-          >
-            Direct Book
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Button 
+              variant="outline"
+              className="w-full sm:w-auto border-saffron-500/50 text-saffron-600 hover:bg-saffron-50 dark:border-saffron-400 dark:text-saffron-400 dark:hover:bg-saffron-500/10"
+              onClick={() => setIsProfileModalOpen(true)}
+            >
+              View Profile
+            </Button>
+            <Button 
+              className="w-full bg-gradient-to-r from-saffron-500 to-marigold-500 hover:from-saffron-600 hover:to-marigold-600 text-white sm:w-auto"
+              onClick={() => setIsModalOpen(true)}
+            >
+              Direct Book
+            </Button>
+          </div>
         </div>
       </motion.div>
 
@@ -162,6 +175,11 @@ export function PurohitCard({ purohit }: PurohitCardProps) {
         onClose={() => setIsModalOpen(false)} 
         purohitId={purohit._id}
         purohitName={purohit.name}
+      />
+      <PurohitProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        purohit={purohit}
       />
     </>
   );

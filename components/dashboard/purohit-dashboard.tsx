@@ -24,6 +24,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useBookingStore } from "@/store/useBookingStore";
 import { usePusherChannel } from "@/hooks/usePusherChannel";
 import { acceptBooking, getNearbyRequests, getMyBookings } from "@/lib/api/bookings";
+import { fetchMyPurohitProfile } from "@/lib/api/purohits";
 import { ApiError } from "@/lib/api/axios";
 import type {
   BroadcastBookingDoc,
@@ -36,11 +37,19 @@ import { OnlineToggle } from "@/app/[locale]/(dashboard)/purohit/components/Onli
 
 export function PurohitDashboard() {
   const profile = useAuthStore((s) => s.profile) as PurohitResponse | null;
+  const setProfile = useAuthStore((s) => s.setProfile);
   const setActiveBooking = useBookingStore((s) => s.setActiveBooking);
   const queryClient = useQueryClient();
 
   const [incomingRequest, setIncomingRequest] =
     useState<NewBookingRequestEvent | null>(null);
+
+  useEffect(() => {
+    // Refresh profile on mount to get latest rating/stats
+    fetchMyPurohitProfile().then((freshProfile) => {
+      setProfile(freshProfile);
+    }).catch(console.error);
+  }, [setProfile]);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
 
   const isOnline = profile?.is_online ?? false;
@@ -142,7 +151,7 @@ export function PurohitDashboard() {
           </CardContent>
         </Card>
 
-        <StatCard icon={Star} label="Rating" value={profile.rating.toFixed(1)} />
+        <StatCard icon={Star} label="Rating" value={(profile.rating || 0).toFixed(1)} />
         <StatCard icon={Wallet} label="Base Dakshina" value={`₹${profile.price}`} />
       </div>
 
