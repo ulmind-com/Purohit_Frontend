@@ -125,11 +125,23 @@ export interface PurohitResponse {
   service_zones: any[];
   address_text: string | null;
   rating: number;
+  total_reviews: number;
   price: number;
   is_available: boolean;
   is_online: boolean;
   fcm_device_token: string | null;
   created_at: string;
+}
+
+export interface ReviewResponse {
+  _id: string;
+  purohit_id: string;
+  user_id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  user_name: string | null;
+  user_avatar: string | null;
 }
 
 export interface PurohitUpdatePayload {
@@ -221,8 +233,9 @@ export interface BookingHistoryResponse {
   booking_id: string;
   purohit_name: string;
   puja_category: string;
-  status: string;
+  status: BookingStatus;
   timestamp: string;
+  is_rated: boolean;
 }
 
 export interface ETAResponse {

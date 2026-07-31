@@ -10,8 +10,14 @@ import { ListSkeleton } from "@/components/shared/loading-skeletons";
 import { ApiErrorAlert } from "@/components/shared/api-error-alert";
 import { getMyBookingHistory } from "@/lib/api/users";
 import { STATUS_BADGE_VARIANT, statusLabel } from "@/lib/booking-status";
+import { RatingModal } from "@/components/bookings/RatingModal";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function UserBookingsPage() {
+  const [ratingModalOpen, setRatingModalOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<{ id: string, purohitName: string } | null>(null);
+
   const query = useQuery({
     queryKey: ["booking-history", 0, 50],
     queryFn: () => getMyBookingHistory(0, 50),
@@ -55,13 +61,42 @@ export default function UserBookingsPage() {
                   {format(new Date(booking.timestamp), "PPP p")}
                 </p>
               </div>
-              <Badge variant={STATUS_BADGE_VARIANT[booking.status] ?? "secondary"}>
-                {statusLabel(booking.status)}
-              </Badge>
+              <div className="flex flex-col items-end gap-2">
+                <Badge variant={STATUS_BADGE_VARIANT[booking.status] ?? "secondary"}>
+                  {statusLabel(booking.status)}
+                </Badge>
+                {booking.status === "Completed" && !booking.is_rated && (
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    className="border-saffron-500 text-saffron-600 hover:bg-saffron-50 dark:border-saffron-400 dark:text-saffron-400 dark:hover:bg-saffron-500/10 shadow-[0_0_10px_rgba(249,115,22,0.3)] animate-pulse"
+                    onClick={() => {
+                      setSelectedBooking({ id: booking.booking_id, purohitName: booking.purohit_name || "Purohit" });
+                      setRatingModalOpen(true);
+                    }}
+                  >
+                    Rate Purohit
+                  </Button>
+                )}
+                {booking.status === "Completed" && booking.is_rated && (
+                  <Badge variant="outline" className="border-green-500/50 text-green-600 bg-green-50 dark:bg-green-500/10 dark:text-green-400">
+                    Rated ✓
+                  </Badge>
+                )}
+              </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {selectedBooking && (
+        <RatingModal 
+          isOpen={ratingModalOpen}
+          onClose={() => setRatingModalOpen(false)}
+          bookingId={selectedBooking.id}
+          purohitName={selectedBooking.purohitName}
+        />
+      )}
     </div>
   );
 }
