@@ -126,6 +126,7 @@ export interface PurohitResponse {
   address_text: string | null;
   rating: number;
   total_reviews: number;
+  total_pujas_completed: number;
   payout_method?: "UPI" | "BANK";
   upi_id?: string;
   bank_account_number?: string;
@@ -134,6 +135,15 @@ export interface PurohitResponse {
   is_available: boolean;
   is_online: boolean;
   fcm_device_token: string | null;
+  profile_picture?: string | null;
+  experience_years?: number;
+  education_upadhi?: string;
+  temple_affiliation?: string | null;
+  mantra_audio_url?: string | null;
+  gallery_urls?: string[];
+  provides_samagri?: boolean;
+  available_for_epuja?: boolean;
+  provides_astrology?: boolean;
   created_at: string;
 }
 
@@ -209,6 +219,12 @@ export interface BookingResponse {
   preferred_tradition?: PujaTradition | null;
   created_at: string;
   updated_at: string;
+  user_name?: string;
+  user_phone?: string;
+  user_image?: string;
+  user_email?: string;
+  user_gotra?: string;
+  user_rashi?: string;
 }
 
 /** Doc shape returned by POST /bookings/request and /bookings/{id}/accept (raw Mongo doc, not BookingResponse). */
@@ -240,6 +256,15 @@ export interface BookingHistoryResponse {
   status: BookingStatus;
   timestamp: string;
   is_rated: boolean;
+  budget?: number;
+  created_at?: string;
+  scheduled_start_time?: string;
+  scheduled_end_time?: string;
+  purohit_rating?: number | null;
+  purohit_image?: string | null;
+  purohit_phone?: string | null;
+  purohit_email?: string | null;
+  purohit_experience?: number | null;
 }
 
 export interface ETAResponse {

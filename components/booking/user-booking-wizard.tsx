@@ -9,11 +9,16 @@ import { format, addHours, parse } from "date-fns";
 import {
   ArrowLeft,
   ArrowRight,
+  Award,
+  BookOpen,
   CalendarIcon,
   CheckCircle2,
   Clock,
+  GraduationCap,
+  Languages,
   Loader2,
   MapPin,
+  Mail,
   PartyPopper,
   Phone,
   Star,
@@ -776,32 +781,144 @@ function MatchedPanel({
       )}
 
       {purohit && (
-        <Card className="w-full text-left">
-          <CardContent className="flex items-center gap-4 py-5">
-            <Avatar className="size-14">
-              <AvatarFallback className="saffron-gradient text-lg text-white">
-                {purohit.name.slice(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <p className="truncate font-semibold">{purohit.name}</p>
-                <Badge variant="secondary" className="gap-1">
-                  <Star className="size-3 fill-current text-saffron-500" />
-                  {purohit.rating.toFixed(1)}
-                </Badge>
+        <motion.div
+          initial={{ opacity: 0, y: 15, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 24 }}
+          className="w-full"
+        >
+          <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-background/50 shadow-2xl backdrop-blur-2xl ring-1 ring-white/5">
+            {/* Rich Ambient Glow Background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-saffron-500/10 via-orange-500/5 to-transparent opacity-80" />
+            <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-saffron-500/20 to-transparent" />
+
+            <div className="relative pt-12 pb-8 px-6 sm:px-8 flex flex-col items-center text-center">
+              
+              {/* Glowing Avatar */}
+              <div className="relative mb-5 group">
+                <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-saffron-400 to-orange-500 opacity-70 blur-md transition duration-500 group-hover:opacity-100" />
+                <Avatar className="relative size-28 sm:size-32 border-[3px] border-background shadow-2xl ring-2 ring-white/10">
+                  {purohit.profile_picture ? (
+                    <img 
+                      src={purohit.profile_picture} 
+                      alt={purohit.name} 
+                      className="size-full object-cover"
+                    />
+                  ) : (
+                    <AvatarFallback className="bg-gradient-to-br from-saffron-400 to-orange-600 text-4xl font-bold text-white shadow-inner">
+                      {purohit.name.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                {purohit.is_online && (
+                  <span className="absolute bottom-2 right-2 size-5 rounded-full border-[3px] border-background bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                )}
               </div>
-              <p className="mt-0.5 flex items-center gap-1 text-sm text-muted-foreground">
-                <Phone className="size-3.5" /> {purohit.mobile_number}
-              </p>
-              {purohit.address_text && (
-                <p className="mt-0.5 flex items-center gap-1 text-sm text-muted-foreground">
-                  <MapPin className="size-3.5" /> {purohit.address_text}
+
+              {/* Name & Title */}
+              <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+                {purohit.name}
+              </h3>
+              
+              {purohit.education_upadhi && (
+                <p className="mt-1.5 text-sm sm:text-base font-semibold text-saffron-600 dark:text-saffron-400">
+                  {purohit.education_upadhi}
                 </p>
               )}
+
+              {/* Rating Badge */}
+              <div className="mt-4 flex items-center justify-center">
+                <div className="flex items-center gap-1.5 rounded-full bg-black/40 dark:bg-white/10 px-3 py-1.5 shadow-inner backdrop-blur-md border border-white/10">
+                  <Star className="size-4 fill-saffron-400 text-saffron-400 drop-shadow-[0_0_3px_rgba(250,204,21,0.5)]" />
+                  <span className="font-bold text-white">{purohit.rating.toFixed(1)}</span>
+                  <span className="text-white/50 px-1">•</span>
+                  <span className="font-medium text-white/80">{purohit.total_reviews} Reviews</span>
+                </div>
+              </div>
+
+              {/* Expertise Tags (Vibrant) */}
+              {purohit.expertise && purohit.expertise.length > 0 && (
+                <div className="mt-6 flex flex-wrap justify-center gap-2">
+                  {purohit.expertise.map((exp) => (
+                    <Badge 
+                      key={exp} 
+                      variant="secondary" 
+                      className="bg-saffron-500/15 hover:bg-saffron-500/25 text-saffron-700 dark:text-saffron-300 border border-saffron-500/20 px-3 py-1 text-xs sm:text-sm transition-colors rounded-full shadow-sm"
+                    >
+                      {exp}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              {/* Stats Grid */}
+              <div className="mt-8 w-full grid grid-cols-2 gap-3 sm:gap-4">
+                {purohit.experience_years !== undefined && (
+                  <div className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-white/5 p-4 border border-white/5 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+                    <Award className="size-5 text-emerald-400 mb-1" />
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Experience</span>
+                    <span className="font-semibold text-foreground">{purohit.experience_years} Years</span>
+                  </div>
+                )}
+                
+                {purohit.total_pujas_completed !== undefined && (
+                  <div className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-white/5 p-4 border border-white/5 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+                    <Sparkles className="size-5 text-purple-400 mb-1" />
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Total Pujas</span>
+                    <span className="font-semibold text-foreground">{purohit.total_pujas_completed} Completed</span>
+                  </div>
+                )}
+                
+                {purohit.languages && purohit.languages.length > 0 && (
+                  <div className="col-span-2 flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-white/5 p-4 border border-white/5 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+                    <Languages className="size-5 text-blue-400 mb-1" />
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Languages</span>
+                    <span className="font-semibold text-foreground text-center line-clamp-1">
+                      {purohit.languages.join(", ")}
+                    </span>
+                  </div>
+                )}
+
+                {purohit.temple_affiliation && (
+                  <div className="col-span-2 flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-gradient-to-r from-rose-500/5 to-orange-500/5 p-4 border border-rose-500/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+                    <MapPin className="size-5 text-rose-400 mb-1" />
+                    <span className="text-xs text-rose-400/80 font-medium uppercase tracking-wider">Temple Affiliation</span>
+                    <span className="font-semibold text-rose-100/90 text-center">{purohit.temple_affiliation}</span>
+                  </div>
+                )}
+              </div>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Bottom Contact & Badges Bar */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-black/20 dark:bg-black/40 px-6 sm:px-8 py-5 border-t border-white/10 backdrop-blur-md">
+              <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-foreground/80">
+                <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
+                  <Phone className="size-4 text-saffron-400" />
+                  <span className="font-semibold tracking-wide">{purohit.mobile_number}</span>
+                </div>
+                {purohit.email && (
+                  <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
+                    <Mail className="size-4 text-saffron-400" />
+                    <span className="font-medium truncate max-w-[180px]">{purohit.email}</span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex gap-2">
+                {purohit.provides_samagri && (
+                  <Badge variant="outline" className="bg-purple-500/10 text-purple-400 border-purple-500/30 text-[10px] h-7 px-3 uppercase tracking-wider rounded-full shadow-sm">
+                    Samagri ✓
+                  </Badge>
+                )}
+                {purohit.available_for_epuja && (
+                  <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/30 text-[10px] h-7 px-3 uppercase tracking-wider rounded-full shadow-sm">
+                    E-Puja ✓
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </div>
+        </motion.div>
       )}
 
       <div className="flex w-full items-center gap-2 rounded-lg bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
