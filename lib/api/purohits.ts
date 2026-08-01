@@ -67,14 +67,7 @@ export async function setupPayout(payload: PayoutSetupPayload) {
   return data;
 }
 
-/**
- * There is no `GET /purohits/{id}` endpoint, so once a Yajman's booking is
- * accepted (the Pusher `booking_accepted` event only carries `purohit_id`),
- * we resolve the display details by scanning the public purohit list. Fine
- * at this dataset size; swap for a dedicated `GET /purohits/{id}` if the
- * Purohit collection grows large enough for this to matter.
- */
 export async function getPurohitById(purohitId: string) {
-  const all = await listPurohits(500);
-  return all.find((p) => p._id === purohitId) ?? null;
+  const { data } = await api.get<PurohitResponse>(`/purohits/${purohitId}`);
+  return data;
 }
